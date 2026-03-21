@@ -696,8 +696,8 @@ function isAltCat(cat) {
   return cat.startsWith('alt.');
 }
 
-// ── CACHE (localStorage, TTL 30분) ────────────────────────────────────────────
-const CACHE_TTL = 30 * 60 * 1000;
+// ── CACHE (localStorage, TTL 24시간) ──────────────────────────────────────────
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 하루 1회 API 호출
 function getCached(key) {
   try {
     const raw = localStorage.getItem('s2_' + key);
@@ -705,6 +705,15 @@ function getCached(key) {
     const { ts, data } = JSON.parse(raw);
     if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem('s2_' + key); return null; }
     return data;
+  } catch { return null; }
+}
+function getCacheAge(key) {
+  try {
+    const raw = localStorage.getItem('s2_' + key);
+    if (!raw) return null;
+    const { ts } = JSON.parse(raw);
+    const h = Math.floor((Date.now() - ts) / 3600000);
+    return h < 1 ? '방금' : `${h}시간 전`;
   } catch { return null; }
 }
 function setCache(key, data) {
@@ -722,12 +731,15 @@ const ALT_QUERIES = [
 ];
 
 async function fetchPapers(filterCat = 'all', maxResults = 30) {
-  // 캐시 확인
+  // 캐시 확인 (24시간 TTL — 하루 1회만 API 호출)
   const cacheKey = filterCat;
   const cached = getCached(cacheKey);
-  if (cached) { console.log(`[S2] 캐시 hit: ${filterCat}`); return cached; }
+  if (cached) {
+    console.log(`[S2] 캐시 hit: ${filterCat} (${getCacheAge(cacheKey)} 업데이트)`);
+    return cached;
+  }
 
-  // 대체투자 카테고리면 전용 쿼리 사용 (버그 수정: CAT_META → ALT_META)
+  // 대체투자 카테고리면 전용 쿼리 사용
   const isAlt = filterCat.startsWith('alt.');
   const queries = filterCat === 'all'
     ? SEARCH_QUERIES
@@ -737,38 +749,33 @@ async function fetchPapers(filterCat = 'all', maxResults = 30) {
 
   const delay = (ms) => new Promise(r => setTimeout(r, ms));
 
-  const fetchOne = async (q, idx) => {
-    if (idx > 0) await delay(idx * 1200); // S2 rate limit: 1 req/sec
-    const url = `${S2_BASE}/paper/search?query=${encodeURIComponent(q)}&fields=${S2_FIELDS}&limit=20`;
+  // 순차 호출 (Rate limit 방지 — 쿼리당 2초 간격, 최대 2개만)
+  const results = [];
+  const queryList = queries.slice(0, 2);
+  for (let i = 0; i < queryList.length; i++) {
+    if (i > 0) await delay(2000);
+    const q = queryList[i];
+    const url = `${S2_BASE}/paper/search?query=${encodeURIComponent(q)}&fields=${S2_FIELDS}&limit=15`;
     try {
       const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
       if (res.status === 429) {
-        console.warn(`[S2] Rate limit (429) for: "${q}" — 재시도 생략`);
-        return [];
+        console.warn(`[S2] Rate limit (429) — 이후 쿼리 중단`);
+        break;
       }
-      if (!res.ok) {
-        console.warn(`[S2] ${res.status} for query: "${q}"`);
-        return [];
-      }
+      if (!res.ok) { console.warn(`[S2] ${res.status} for: "${q}"`); continue; }
       const data = await res.json();
       console.log(`[S2] "${q}" → ${(data.data || []).length}건`);
-      return data.data || [];
+      results.push(...(data.data || []));
     } catch (e) {
       console.warn(`[S2] fetch 실패: ${e.message}`);
-      return [];
     }
-  };
-
-  const fetches = queries.slice(0, 3).map((q, i) => fetchOne(q, i));
-
-  const results = await Promise.all(fetches);
+  }
 
   // 중복 제거 + 최신순 정렬
   const seen = new Set();
   const papers = results
-    .flat()
     .filter(p => {
-      if (!p.title) return false;
+      if (!p.title || !p.paperId) return false;
       if (seen.has(p.paperId)) return false;
       seen.add(p.paperId);
       return true;
@@ -781,7 +788,7 @@ async function fetchPapers(filterCat = 'all', maxResults = 30) {
     .slice(0, maxResults);
 
   const mapped = papers.map(mapS2Paper);
-  setCache(cacheKey, mapped);
+  if (mapped.length > 0) setCache(cacheKey, mapped); // 결과 있을 때만 캐시
   return mapped;
 }
 
@@ -1329,13 +1336,17 @@ async function filterByCat(cat) {
   try {
     const papers = await fetchPapers(cat, 30);
     allPapers = papers;
-    render(papers, cat);
+    if (papers.length) {
+      render(papers, cat);
+    } else if (isAltCat(cat)) {
+      renderFallback(cat);
+    } else {
+      render([], cat);
+    }
   } catch (err) {
-    document.getElementById('app').innerHTML = `
-      <div class="container"><div class="error-state">
-        <h3>Fetch failed</h3><p>${err.message}</p>
-        <button class="btn" style="margin-top:1.5rem" onclick="location.reload()">↺ Retry</button>
-      </div></div>`;
+    console.warn('[S2] filterByCat error:', err.message);
+    if (isAltCat(cat)) renderFallback(cat);
+    else render([], cat);
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1349,27 +1360,73 @@ document.addEventListener('click', e => {
   filterByCat(tag.dataset.cat);
 });
 
+// ── FALLBACK: API 실패 시 정적 인사이트 렌더링 ────────────────────────────────
+function renderFallback(cat) {
+  const meta = ALT_META[cat] || ALT_META['alt.PE'];
+  document.getElementById('issue-info').textContent =
+    `${meta.title} · 인사이트 요약`;
+
+  document.getElementById('app').innerHTML = `
+    <div style="background:${meta.color};color:#fff;padding:3rem 0">
+      <div class="container">
+        <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start">
+          <div style="flex:1;min-width:260px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;opacity:.7;margin-bottom:.8rem">대체투자 리서치</div>
+            <h2 style="font-family:var(--serif);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;line-height:1.12;margin-bottom:.9rem">${meta.icon} ${meta.title}</h2>
+            <p style="font-size:15px;line-height:1.72;opacity:.85;max-width:46ch">${meta.desc}</p>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;min-width:260px">
+            ${meta.stats.map(s => `
+              <div style="background:rgba(255,255,255,.12);padding:1.1rem;border-radius:2px">
+                <div style="font-family:var(--mono);font-size:1.3rem;font-weight:700">${s.num}</div>
+                <div style="font-size:11px;opacity:.75;margin-top:.3rem;white-space:pre-line">${s.desc}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="padding-top:2.5rem;padding-bottom:3rem">
+      <div style="display:flex;align-items:baseline;gap:1rem;margin-bottom:1.5rem;padding-bottom:.6rem;border-bottom:1.5px solid var(--ink)">
+        <h2 style="font-family:var(--serif);font-size:1.3rem;font-weight:700">핵심 인사이트</h2>
+        <span style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-light);margin-left:auto">API 오프라인 — 정적 콘텐츠</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem">
+        ${meta.insights.map((txt, i) => `
+          <div style="padding:1.5rem;border:1px solid var(--rule-dark);border-top:3px solid ${meta.color}">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--ink-light);margin-bottom:.8rem">${String(i+1).padStart(2,'0')}</div>
+            <p style="font-size:14px;line-height:1.72;color:var(--ink)">${txt}</p>
+          </div>`).join('')}
+      </div>
+
+      <div style="margin-top:2rem;padding:1.2rem 1.5rem;background:var(--paper-warm);border:1px solid var(--rule-dark);display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <span style="font-size:13px;color:var(--ink-muted)">논문 데이터를 불러오지 못했습니다. Semantic Scholar API가 일시 제한 중일 수 있습니다.</span>
+        <button class="btn" style="margin-left:auto;white-space:nowrap" onclick="retryLoad('${cat}')">↺ 다시 시도</button>
+      </div>
+    </div>`;
+}
+
+async function retryLoad(cat) {
+  // 캐시 강제 삭제 후 재시도
+  try { localStorage.removeItem('s2_' + cat); } catch {}
+  await filterByCat(cat);
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (async () => {
+  const initCat = 'alt.PE';
   try {
-    const papers = await fetchPapers('alt.PE', 30);
-    if (!papers.length) throw new Error('No papers returned from Semantic Scholar API.');
+    const papers = await fetchPapers(initCat, 30);
     allPapers = papers;
-    render(papers, 'alt.PE');
+    if (papers.length) {
+      render(papers, initCat);
+    } else {
+      console.warn('[S2] 논문 없음 — 정적 폴백 표시');
+      renderFallback(initCat);
+    }
   } catch (err) {
     console.error(err);
-    document.getElementById('app').innerHTML = `
-      <div class="container">
-        <div class="error-state">
-          <h3>Unable to load papers</h3>
-          <p style="margin-top:0.5rem">
-            The Semantic Scholar API may be temporarily unavailable.<br>
-            Please check your network connection and try refreshing.
-          </p>
-          <p style="margin-top:1rem;font-family:var(--mono);font-size:12px;color:var(--ink-light)">${err.message}</p>
-          <button class="btn" style="margin-top:1.5rem" onclick="location.reload()">↺ Retry</button>
-        </div>
-      </div>`;
+    renderFallback(initCat);
   }
 })();
 </script>
