@@ -5,186 +5,252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대체투자 뉴스피드 — Alternative Investment News</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --ink:        #f1f5f9;
-      --ink-muted:  #94a3b8;
-      --ink-light:  #475569;
-      --paper:      #07090f;
-      --paper-warm: #0c1120;
-      --paper-dark: #050810;
-      --rule:       rgba(255,255,255,0.06);
-      --rule-dark:  rgba(255,255,255,0.11);
-      --accent:     #4f8ef7;
-      --accent-dk:  #2563eb;
-      --accent-lt:  rgba(79,142,247,0.08);
-      --navy:       #4f8ef7;
-      --navy-lt:    rgba(79,142,247,0.1);
-      --gold:       #f59e0b;
-      --gold-lt:    rgba(245,158,11,0.1);
-      --teal:       #06d6a0;
-      --serif: 'Playfair Display', Georgia, serif;
-      --sans:  'Space Grotesk', 'Inter', system-ui, sans-serif;
-      --mono:  'JetBrains Mono', monospace;
-      --glow-blue: 0 0 24px rgba(79,142,247,0.2);
-      --glow-sm: 0 0 12px rgba(79,142,247,0.12);
-      --radius: 10px;
-      --radius-sm: 6px;
+      --bg:        #09090f;
+      --bg-2:      #111118;
+      --bg-3:      #18181f;
+      --ink:       #e2e2f0;
+      --ink-2:     #6b6b90;
+      --ink-3:     #3a3a55;
+      --border:    rgba(255,255,255,0.06);
+      --border-2:  rgba(255,255,255,0.11);
+      --accent:    #a78bfa;
+      --accent-2:  #60a5fa;
+      --accent-dk: #7c3aed;
+      --accent-lt: rgba(167,139,250,0.10);
+      --gradient:  linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+      --r: 12px; --r-sm: 8px; --r-lg: 16px;
+
+      --paper-warm: #111118; --paper: #18181f; --paper-dark: #0d0d14;
+      --navy: #1a1a28; --navy-lt: rgba(167,139,250,0.08);
+      --rule: rgba(255,255,255,0.07); --rule-dark: rgba(255,255,255,0.12);
+      --ink-muted: #6b6b90; --ink-light: #4a4a68;
+      --gold: #a78bfa; --teal: #60a5fa;
+      --glow-blue: 0 0 20px rgba(167,139,250,0.15);
+      --glow-sm: 0 2px 12px rgba(167,139,250,0.10);
+      --radius: 12px; --radius-sm: 8px;
+      --sans:  "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+      --serif: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+      --mono:  "JetBrains Mono", "Noto Sans Mono", monospace;
     }
+    [data-theme="light"] {
+      --bg: #f8f8ff; --bg-2: #f0f0fa; --bg-3: #e8e8f5;
+      --ink: #0f0f1a; --ink-2: #5a5a78; --ink-3: #a0a0c0;
+      --border: rgba(0,0,0,0.07); --border-2: rgba(0,0,0,0.12);
+      --accent: #7c3aed; --accent-2: #2563eb; --accent-dk: #5b21b6;
+      --accent-lt: rgba(124,58,237,0.08);
+      --paper-warm: #f0f0fa; --paper: #e8e8f5; --paper-dark: #e0e0f0;
+      --rule: rgba(0,0,0,0.07); --rule-dark: rgba(0,0,0,0.13);
+      --ink-muted: #5a5a78; --ink-light: #7070a0;
+      --navy: #ebebff; --navy-lt: rgba(124,58,237,0.06);
+    }
+    [data-theme="light"] .masthead { background: rgba(248,248,255,0.92); }
+    [data-theme="light"] .blob { opacity: 0.08; }
+
     html { scroll-behavior: smooth; }
     body {
-      font-family: var(--sans); background: var(--paper); color: var(--ink);
-      line-height: 1.65; font-size: 15px; min-height: 100vh;
-      background-image:
-        radial-gradient(ellipse at 20% 0%, rgba(79,142,247,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 100%, rgba(6,214,160,0.04) 0%, transparent 50%);
+      font-family: var(--sans); background: var(--bg); color: var(--ink);
+      line-height: 1.6; font-size: 14px; min-height: 100dvh;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.25s, color 0.25s;
     }
+
+    /* ── BLOBS ── */
+    .blob { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.20; animation: blob 8s infinite ease-in-out; pointer-events: none; z-index: -1; }
+    .blob-1 { width: 600px; height: 600px; background: var(--accent);   top: -180px; left: -80px;  animation-delay: 0s; }
+    .blob-2 { width: 500px; height: 500px; background: var(--accent-2); bottom: -130px; right: -80px; animation-delay: 3s; }
+    @keyframes blob { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-50px) scale(1.08)} 66%{transform:translate(-20px,20px) scale(0.94)} }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
 
     /* ── MASTHEAD ── */
-    .masthead { background: rgba(7,9,15,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--rule-dark); }
-    .masthead::before { content: ''; display: block; height: 2px; background: linear-gradient(90deg, #4f8ef7 0%, #06d6a0 50%, #a78bfa 100%); }
-    .masthead-top { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 2.5rem; border-bottom: 1px solid var(--rule); }
-    .issue-info { font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); font-family: var(--mono); }
-    .page-nav { display: flex; gap: 0.4rem; }
-    .page-nav a { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; text-decoration: none; padding: 0.3rem 0.9rem; border-radius: 20px; border: 1px solid var(--rule-dark); color: var(--ink-muted); transition: all 0.2s; }
-    .page-nav a:hover { border-color: var(--accent); color: var(--accent); }
-    .page-nav a.current { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: var(--glow-sm); }
-    .masthead-title { text-align: center; padding: 1.4rem 2rem 1.1rem; }
-    .magazine-name { font-family: var(--serif); font-size: clamp(1.9rem, 4vw, 3.2rem); font-weight: 900; letter-spacing: -0.02em; line-height: 1; color: var(--ink); }
-    .magazine-name span { background: linear-gradient(135deg, #4f8ef7, #06d6a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .magazine-tagline { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-light); margin-top: 0.5rem; }
-    .masthead-nav { border-top: 1px solid var(--rule); }
-    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 0.5rem; }
+    .masthead { background: rgba(9,9,15,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-2); transition: background 0.25s; }
+    .masthead::before { content: ""; display: block; height: 2px; background: var(--gradient); opacity: 0.65; }
+    .masthead-top { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 2.5rem; border-bottom: 1px solid var(--border); }
+    .issue-info { font-size: 11px; letter-spacing: 0.03em; color: var(--ink-2); }
+    .page-nav { display: flex; gap: 0.3rem; align-items: center; }
+    .page-nav a { font-size: 11px; font-weight: 500; text-decoration: none; padding: 0.3rem 0.8rem; border-radius: var(--r-sm); border: 1px solid transparent; color: var(--ink-2); transition: all 0.15s; }
+    .page-nav a:hover { color: var(--ink); background: var(--border); }
+    .page-nav a.current { background: var(--accent-lt); color: var(--accent); border-color: rgba(167,139,250,0.25); font-weight: 600; }
+    .page-nav a:active { transform: translateY(1px); }
+    .theme-btn { background: none; border: 1px solid var(--border-2); color: var(--ink-2); font-size: 14px; padding: 0.25rem 0.6rem; border-radius: var(--r-sm); cursor: pointer; transition: all 0.15s; line-height: 1; }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+    .theme-btn:active { transform: translateY(1px); }
+    .masthead-title { text-align: center; padding: 1rem 2rem 0.85rem; }
+    .magazine-name { font-size: clamp(1.1rem, 2.4vw, 1.7rem); font-weight: 800; letter-spacing: -0.01em; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .magazine-name span { -webkit-text-fill-color: transparent; }
+    .magazine-tagline { font-size: 11px; letter-spacing: 0.04em; color: var(--ink-2); margin-top: 0.3rem; }
+    .masthead-nav { border-top: 1px solid var(--border); }
+    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; align-items: center; }
     .field-tags::-webkit-scrollbar { display: none; }
-    .field-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-light); cursor: pointer; text-decoration: none; transition: color 0.2s, background 0.2s; padding: 0.75rem 1.4rem; border-bottom: 2px solid transparent; white-space: nowrap; }
-    .field-tag:hover { color: var(--ink); }
-    .field-tag.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
-    .field-tag--alt { color: var(--gold); }
-    .field-tag--alt:hover { color: var(--ink); }
-    .field-tag--alt.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .field-tag { font-size: 11px; font-weight: 500; color: var(--ink-2); cursor: pointer; text-decoration: none; transition: all 0.15s; padding: 0.7rem 1.2rem; border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
+    .field-tag:hover { color: var(--ink); background: var(--border); }
+    .field-tag.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .field-tag:active { opacity: 0.75; }
 
     /* ── FEED TOGGLE ── */
-    .feed-toggle { display: flex; align-items: center; gap: 0; margin-left: auto; padding: 0 1rem; }
-    .feed-toggle-btn { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; border: 1px solid var(--rule-dark); background: transparent; color: var(--ink-light); padding: 0.38rem 0.85rem; transition: all 0.2s; white-space: nowrap; }
-    .feed-toggle-btn:first-child { border-radius: 20px 0 0 20px; }
-    .feed-toggle-btn:last-child { border-radius: 0 20px 20px 0; margin-left: -1px; }
-    .feed-toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: var(--glow-sm); }
-    .feed-toggle-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
-
-    /* ── LAYOUT ── */
-    .container { max-width: 1280px; margin: 0 auto; padding: 0 2.5rem; }
-
-    /* ── LOADING ── */
-    .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8rem 2rem; gap: 1.2rem; }
-    .loading-spinner { width: 2rem; height: 2rem; border: 1.5px solid var(--rule-dark); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-light); }
+    .feed-toggle { display: flex; gap: 0.3rem; margin-left: auto; padding: 0.4rem 1rem; flex-shrink: 0; }
+    .feed-toggle-btn { font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-2); background: transparent; color: var(--ink-2); padding: 0.28rem 0.75rem; border-radius: var(--r-sm); transition: all 0.12s; white-space: nowrap; }
+    .feed-toggle-btn:hover { color: var(--ink); background: var(--border); }
+    .feed-toggle-btn.active { background: var(--accent-lt); color: var(--accent); border-color: rgba(167,139,250,0.25); }
+    .feed-toggle-btn:active { transform: translateY(1px); }
 
     /* ── TICKER ── */
-    .ticker-wrap { background: var(--paper-warm); border-bottom: 1px solid var(--rule-dark); overflow: hidden; height: 2.2rem; display: flex; align-items: center; }
-    .ticker-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); padding: 0 1.2rem; white-space: nowrap; border-right: 1px solid var(--rule-dark); flex-shrink: 0; }
-    .ticker-track { display: flex; gap: 3.5rem; animation: ticker 45s linear infinite; white-space: nowrap; padding-left: 2rem; }
-    .ticker-track:hover { animation-play-state: paused; }
-    .ticker-item { font-size: 11.5px; color: var(--ink-muted); font-weight: 400; }
-    .ticker-item span { color: var(--ink-light); margin-right: 0.5rem; }
-    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .ticker-wrap { overflow: hidden; border-bottom: 1px solid var(--border); background: rgba(167,139,250,0.04); height: 34px; display: flex; align-items: center; }
+    .ticker-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); padding: 0 1.1rem; white-space: nowrap; border-right: 1px solid var(--border-2); flex-shrink: 0; }
+    .ticker-track { display: flex; animation: ticker 45s linear infinite; white-space: nowrap; }
+    .ticker-item  { font-size: 11px; color: var(--ink-2); padding: 0 2rem; transition: color 0.12s; }
+    .ticker-item:hover { color: var(--ink); }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-    /* ── HERO BANNER ── */
-    .cat-hero { color: var(--ink); padding: 2.5rem 0; }
-    .cat-hero-inner { display: flex; align-items: flex-start; gap: 3rem; flex-wrap: wrap; }
-    .cat-hero-info { flex: 1; min-width: 280px; }
-    .cat-hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 0.8rem; }
-    .cat-hero-title { font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; line-height: 1.12; margin-bottom: 0.9rem; }
-    .cat-hero-desc { font-size: 15px; line-height: 1.72; color: var(--ink-muted); max-width: 48ch; }
+    /* ── SKELETON ── */
+    .loading-text { font-size: 11px; letter-spacing: 0.05em; color: var(--ink-2); padding: 3rem 0; text-align: center; }
+    .skeleton-screen { padding: 2rem 0; }
+    .sk-block { background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 50%, var(--bg-2) 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite linear; border-radius: 6px; }
+    @keyframes shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
+    .sk-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+    .sk-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--r); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; min-height: 180px; }
+    .sk-line{height:14px} .sk-line-lg{height:26px} .sk-line-sm{height:10px}
+    .sk-w-80{width:80%}   .sk-w-60{width:60%}    .sk-w-40{width:40%}
 
-    /* ── NEWS SECTION ── */
-    .news-section { padding: 2.5rem 0; }
-    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--rule-dark); }
-    .section-title { font-family: var(--sans); font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
-    .section-meta { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-left: auto; font-family: var(--mono); }
+    /* ── NEWS LAYOUT ── */
+    .news-section { padding: 2rem 0; }
+    .news-grid     { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 2rem; }
+    .news-featured { display: grid; grid-template-columns: 3fr 2fr; gap: 1rem; margin-bottom: 2rem; }
+    .news-card {
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--r);
+      padding: 1.4rem; display: flex; flex-direction: column; gap: 0.5rem;
+      cursor: pointer; text-decoration: none; color: inherit;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .news-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,0.28); box-shadow: 0 8px 28px rgba(167,139,250,0.09); }
+    .news-card:active { transform: translateY(0); opacity: 0.9; }
+    .news-card-source { font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .news-card-title  { font-size: 13px; font-weight: 700; line-height: 1.45; color: var(--ink); flex: 1; letter-spacing: -0.01em; }
+    .news-card-time   { font-size: 10px; color: var(--ink-2); margin-top: auto; }
+    .source-badge { font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 4px; background: var(--accent-lt); color: var(--accent); display: inline-block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
-    /* Featured */
-    .news-featured { display: grid; grid-template-columns: 3fr 2fr; border: 1px solid var(--rule-dark); border-radius: var(--radius); overflow: hidden; margin-bottom: 2rem; background: var(--paper-warm); }
-    .news-featured-body { padding: 2.5rem; border-right: 1px solid var(--rule); }
-    .news-featured-side { padding: 2rem; background: rgba(255,255,255,0.01); display: flex; flex-direction: column; gap: 1.4rem; }
-    .news-source-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1rem; color: var(--accent); }
-    .news-source-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-    .news-featured-title { font-family: var(--serif); font-size: clamp(1.3rem, 2.2vw, 1.85rem); font-weight: 700; line-height: 1.22; margin-bottom: 1rem; color: var(--ink); text-decoration: none; display: block; transition: color 0.2s; }
-    .news-featured-title:hover { color: var(--accent); }
-    .news-featured-desc { font-size: 14px; line-height: 1.75; color: var(--ink-muted); margin-bottom: 1.2rem; }
-    .news-meta { font-size: 10.5px; color: var(--ink-light); display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
-    .news-meta a { color: var(--accent); font-weight: 700; text-decoration: none; font-size: 11px; letter-spacing: 0.06em; }
-    .news-side-item { padding-bottom: 1.3rem; border-bottom: 1px solid var(--rule); }
-    .news-side-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .news-side-title { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; line-height: 1.32; color: var(--ink); text-decoration: none; display: block; margin-bottom: 0.3rem; transition: color 0.2s; }
-    .news-side-title:hover { color: var(--accent); }
-    .news-side-meta { font-size: 10.5px; color: var(--ink-light); }
+    /* ── SECTORS ── */
+    .sector-tile {
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: var(--r);
+      padding: 1rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .sector-tile:hover  { border-color: rgba(167,139,250,0.3); background: var(--accent-lt); transform: translateY(-2px); }
+    .sector-tile:active { transform: translateY(0); opacity: 0.85; }
+    .sector-tile.active { border-color: var(--accent); background: var(--accent-lt); }
+    .sector-icon { font-size: 1.2rem; }
+    .sector-name { font-size: 12px; font-weight: 700; color: var(--ink); }
+    .sector-en   { font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
 
-    /* News grid */
-    .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); margin-bottom: 2rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--rule-dark); }
-    .news-card { background: var(--paper-warm); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.55rem; transition: background 0.2s; border-left: 2px solid transparent; }
-    .news-card:hover { background: rgba(79,142,247,0.05); border-left-color: var(--accent); }
-    .news-card-num { font-family: var(--mono); font-size: 10px; color: var(--ink-light); }
-    .news-card-title { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; line-height: 1.38; color: var(--ink); text-decoration: none; flex: 1; transition: color 0.2s; }
-    .news-card-title:hover { color: var(--accent); }
-    .news-card-desc { font-size: 12px; line-height: 1.58; color: var(--ink-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .news-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: var(--ink-light); margin-top: auto; padding-top: 0.6rem; border-top: 1px solid var(--rule); }
-    .news-card-source { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); }
+    /* Section labels */
+    .section-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: var(--border-2); }
+    .section-meta { font-size: 10px; letter-spacing: 0.04em; color: var(--ink-2); }
+    .cat-hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.6rem; display: block; }
+    .cat-hero-title { font-size: clamp(1.2rem, 2.5vw, 1.7rem); font-weight: 800; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; }
+    .error-state { text-align: center; padding: 4rem 2rem; color: var(--ink-2); }
+    .error-state h3 { font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem; }
 
-    /* Sectors strip */
-    .sectors-strip { background: var(--paper-warm); padding: 2.5rem 0; border-top: 1px solid var(--rule-dark); margin-top: 1rem; }
-    .sectors-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--rule); border-radius: var(--radius); overflow: hidden; }
-    .sector-tile { background: var(--paper-warm); padding: 1.4rem 1rem; cursor: pointer; transition: background 0.2s; text-align: center; border-bottom: 2px solid transparent; }
-    .sector-tile:hover { background: rgba(79,142,247,0.05); }
-    .sector-tile.active-tile { background: rgba(79,142,247,0.08); border-bottom-color: var(--accent); }
-    .sector-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
-    .sector-name { font-size: 13px; font-weight: 700; color: var(--ink); }
-    .sector-en { font-size: 9.5px; color: var(--ink-light); margin-top: 0.25rem; letter-spacing: 0.06em; text-transform: uppercase; }
-
-    /* Source Badge */
-    .source-badge { display: inline-block; font-size: 8.5px; padding: 1px 5px; border-radius: 4px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-left: 0.4rem; vertical-align: middle; }
-    .source-reddit  { background: rgba(255,69,0,0.2); color: #ff6b35; }
-    .source-google  { background: rgba(66,133,244,0.2); color: #4285F4; }
-    .source-naver   { background: rgba(3,199,90,0.2); color: #03C75A; }
-    .source-rss     { background: rgba(255,255,255,0.1); color: var(--ink-muted); }
-
-    /* Error */
-    .error-state { text-align: center; padding: 5rem 2rem; color: var(--ink-muted); }
-    .error-state h3 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--ink); }
-    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.3rem; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; border: 1.5px solid var(--accent); cursor: pointer; text-decoration: none; transition: all 0.2s; border-radius: var(--radius-sm); box-shadow: var(--glow-sm); }
-    .btn:hover { background: var(--accent-dk); border-color: var(--accent-dk); box-shadow: var(--glow-blue); }
-
-    /* Footer */
-    footer { background: var(--paper-dark); border-top: 1px solid var(--rule-dark); padding: 3rem 0; margin-top: 0; }
-    .footer-inner { text-align: center; }
-    .footer-name { font-family: var(--serif); font-size: 1.5rem; font-weight: 900; color: var(--ink); margin-bottom: 0.6rem; }
-    .footer-name span { background: linear-gradient(135deg, #4f8ef7, #06d6a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .footer-note { font-size: 12px; line-height: 1.7; max-width: 50ch; margin: 0 auto 1.2rem; color: var(--ink-light); }
-    .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
-    .footer-link { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); text-decoration: none; transition: color 0.15s; }
+    /* ── FOOTER ── */
+    .site-footer  { border-top: 1px solid var(--border); padding: 2rem 0; margin-top: 2rem; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-note  { font-size: 11px; color: var(--ink-3); }
+    .footer-name  { font-size: 11px; font-weight: 600; color: var(--ink-2); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-link  { font-size: 11px; color: var(--ink-2); text-decoration: none; transition: color 0.12s; }
     .footer-link:hover { color: var(--accent); }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--paper-dark); }
-    ::-webkit-scrollbar-thumb { background: var(--rule-dark); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--ink-light); }
-
-    @media (max-width: 1024px) { .sectors-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 900px) {
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .news-grid { grid-template-columns: repeat(2,1fr); }
       .news-featured { grid-template-columns: 1fr; }
-      .news-featured-body { border-right: none; border-bottom: 1px solid var(--rule); }
-      .news-grid { grid-template-columns: repeat(2, 1fr); }
+      .sectors-strip { grid-template-columns: repeat(3,1fr); }
+      .sk-grid { grid-template-columns: repeat(2,1fr); }
     }
     @media (max-width: 640px) {
-      .container { padding: 0 1.2rem; }
+      .container { padding: 0 1rem; }
       .masthead-top { display: none; }
       .news-grid { grid-template-columns: 1fr; }
-      .sectors-grid { grid-template-columns: repeat(2, 1fr); }
+      .sectors-strip { grid-template-columns: repeat(2,1fr); }
+      .sk-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── MISSING CLASSES (JS-rendered) ── */
+    .loading-screen { display: flex; align-items: center; justify-content: center; height: 60vh; flex-direction: column; gap: 1rem; }
+    .loading-spinner { width: 28px; height: 28px; border: 2px solid var(--border-2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .section-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; }
+
+    /* Cat hero glass panel */
+    .cat-hero { padding: 2rem 0 0; }
+    .cat-hero-inner { display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap; }
+    .cat-hero-info { flex: 1; min-width: 260px; }
+    .cat-hero-desc { font-size: 14px; line-height: 1.72; color: var(--ink-2); margin-top: 0.6rem; max-width: 50ch; }
+
+    /* Featured news */
+    .news-featured-body {
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(16px);
+      border: 1px solid var(--border-2); border-radius: var(--r-lg);
+      padding: 2rem; display: flex; flex-direction: column; gap: 0.8rem;
+    }
+    .news-featured-side {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 1.4rem;
+      display: flex; flex-direction: column; gap: 0.8rem;
+    }
+    .news-featured-title {
+      font-size: 1.25rem; font-weight: 800; line-height: 1.35; letter-spacing: -0.02em;
+      color: var(--ink); text-decoration: none; transition: color 0.15s; display: block;
+    }
+    .news-featured-title:hover { color: var(--accent); }
+    .news-featured-desc { font-size: 14px; line-height: 1.72; color: var(--ink-2); }
+    .news-meta { display: flex; align-items: center; gap: 1rem; font-size: 11px; color: var(--ink-2); margin-top: auto; flex-wrap: wrap; }
+    .news-source-tag { display: flex; align-items: center; gap: 0.5rem; }
+    .news-source-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* Side items */
+    .news-side-item { padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+    .news-side-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .news-side-title { font-size: 12.5px; font-weight: 600; line-height: 1.45; color: var(--ink-2); text-decoration: none; display: block; transition: color 0.12s; }
+    .news-side-title:hover { color: var(--ink); }
+    .news-side-meta { font-size: 10px; color: var(--ink-3); margin-top: 0.3rem; }
+
+    /* News card variants */
+    .news-card-num { font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; }
+    .news-card-title { font-size: 13px; font-weight: 700; line-height: 1.45; color: var(--ink); text-decoration: none; flex: 1; display: block; transition: color 0.12s; }
+    .news-card-title:hover { color: var(--accent); }
+    .news-card-desc { font-size: 11.5px; line-height: 1.6; color: var(--ink-2); }
+    .news-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid var(--border); font-size: 10px; color: var(--ink-2); }
+    .news-card-footer > span:last-child { white-space: nowrap; flex-shrink: 0; }
+    .news-card-source { display: flex; align-items: center; gap: 0.4rem; font-size: 9.5px; font-weight: 600; color: var(--accent); }
+    .source-reddit { background: rgba(255,87,0,0.12); color: #ff5700; }
+    .source-google { background: rgba(96,165,250,0.12); color: var(--accent-2); }
+
+    /* Sectors */
+    .sectors-strip { padding: 2rem 0; border-top: 1px solid var(--border); margin-top: 2rem; }
+    .sectors-grid  { display: grid; grid-template-columns: repeat(5,1fr); gap: 0.75rem; margin-top: 1rem; }
+    .active-tile   { border-color: var(--accent) !important; background: var(--accent-lt) !important; }
+
+    @media (max-width: 768px) {
+      .cat-hero-inner { flex-direction: column; }
+      .news-featured { grid-template-columns: 1fr; }
+      .sectors-grid { grid-template-columns: repeat(3,1fr); }
+    }
+    @media (max-width: 480px) {
+      .sectors-grid { grid-template-columns: repeat(2,1fr); }
     }
   </style>
+
 </head>
 <body>
 
@@ -195,11 +261,12 @@
     <nav class="page-nav">
       <a href="index.html">리서치 논문</a>
       <a class="current" href="news.html">뉴스 피드</a>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="테마 변경">☀</button>
     </nav>
   </div>
   <div class="masthead-title">
     <div class="magazine-name">대체투자 <span>뉴스피드</span></div>
-    <div class="magazine-tagline">Alternative Investment News — RSS Live Feed · Private Equity · Real Estate · Infrastructure · Hedge Fund · VC</div>
+    <div class="magazine-tagline">Live intelligence across private equity, real assets, and venture</div>
   </div>
   <div class="masthead-nav">
     <nav class="field-tags container">
@@ -226,13 +293,34 @@
 
 <!-- MAIN -->
 <div id="app">
-  <div class="loading-screen">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">RSS 피드 수신 중...</div>
+  <div class="skeleton-screen container">
+    <div class="sk-grid" style="grid-template-columns: 3fr 2fr; min-height: 220px;">
+      <div class="sk-card"><div class="sk-block sk-line-sm sk-w-40"></div><div class="sk-block sk-line-lg sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line sk-w-80"></div></div>
+      <div class="sk-card"><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-40"></div></div>
+    </div>
+    <div class="sk-grid">
+      <div class="sk-card"><div class="sk-block sk-line-sm sk-w-40"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div></div>
+      <div class="sk-card"><div class="sk-block sk-line-sm sk-w-40"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div></div>
+      <div class="sk-card"><div class="sk-block sk-line-sm sk-w-40"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div></div>
+    </div>
   </div>
 </div>
 
 <script>
+// ── THEME ──────────────────────────────────────────────────────────────────────
+(function(){ document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark'); })();
+function toggleTheme() {
+  var next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  var btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = next === 'light' ? '☾' : '☀';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light' ? '☾' : '☀';
+});
+
 // ── RSS FEED SOURCES (Google News RSS — 무료, 안정적) ─────────────────────────
 const GN = (q, lang = 'en', country = 'US') =>
   `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=${lang}&gl=${country}&ceid=${country}:${lang}`;
@@ -241,7 +329,7 @@ const FEEDS = {
   'alt.PE': [
     { label: 'Google News',    url: GN('private equity buyout M&A fund') },
     { label: 'Google News',    url: GN('LBO leveraged buyout secondary market PE') },
-    { label: 'TechCrunch',     url: 'https://techcrunch.com/feed/' },
+    { label: 'Google News',    url: GN('private equity portfolio company carry capital call') },
   ],
   'alt.RE': [
     { label: 'Google News',    url: GN('real estate investment REIT commercial') },
@@ -296,6 +384,48 @@ const FEEDS_KO = {
     { label: '조선비즈',        url: 'https://biz.chosun.com/arc/outboundfeeds/rss/?outputType=xml' },
   ],
 };
+
+// ── CATEGORY KEYWORDS (제목+본문에 하나라도 포함 시 통과) ────────────────────
+const CAT_KEYWORDS = {
+  'alt.PE': [
+    'private equity','buyout','lbo','leveraged buyout','m&a','merger','acquisition',
+    'pe firm','portfolio company','general partner','limited partner','capital call',
+    'carried interest','gp','dry powder','deal flow','exit multiple','secondary',
+    '사모펀드','pef','바이아웃','인수합병','기업인수','포트폴리오','사모','경영참여',
+  ],
+  'alt.RE': [
+    'real estate','reit','property','commercial','office','retail','logistics',
+    'warehouse','data center','mortgage','cap rate','noi','net operating income',
+    'occupancy','industrial','multifamily','residential','infrastructure fund',
+    '부동산','리츠','오피스','물류','데이터센터','상업용','임대','분양','토지',
+  ],
+  'alt.INF': [
+    'infrastructure','renewable','solar','wind','power grid','fiber','tower',
+    'toll road','airport','seaport','utility','energy transition','battery storage',
+    'transmission','digital infrastructure','5g','broadband','water treatment',
+    '인프라','재생에너지','태양광','풍력','송전','에너지전환','통신탑','항만','공항',
+  ],
+  'alt.HF': [
+    'hedge fund','quant','quantitative','systematic','global macro','alpha',
+    'short selling','long short','arbitrage','derivatives','volatility','options',
+    'algorithmic trading','factor','risk premium','market neutral','event driven',
+    '헤지펀드','퀀트','매크로','차익거래','파생','전략펀드','알파','리스크',
+  ],
+  'alt.VC': [
+    'venture capital','startup','funding round','series a','series b','series c',
+    'seed round','unicorn','ipo','exit','valuation','founder','portfolio',
+    'deep tech','biotech','climate tech','ai startup','fintech','saas',
+    '벤처','스타트업','시리즈','투자유치','유니콘','상장','엑싯','기업공개','vc',
+  ],
+};
+
+// 제목 또는 설명에 카테고리 키워드가 하나라도 포함되면 true
+function matchesCategory(item, cat) {
+  const kws = CAT_KEYWORDS[cat];
+  if (!kws) return true; // 키워드 정의 없으면 통과
+  const text = (item.title + ' ' + (item.desc || '')).toLowerCase();
+  return kws.some(kw => text.includes(kw.toLowerCase()));
+}
 
 const CAT_META = {
   'alt.PE':  { title: '사모펀드', en: 'Private Equity',    color: '#7d6608', bg: '#fef9e7', icon: '🏦',
@@ -430,20 +560,22 @@ function renderNews(items, cat) {
   document.getElementById('app').innerHTML = `
 
     <!-- HERO BANNER -->
-    <div class="cat-hero" style="background:${meta.color}">
-      <div class="container">
-        <div class="cat-hero-inner">
-          <div class="cat-hero-info">
-            <div class="cat-hero-label">대체투자 뉴스피드 ${currentMode === 'ko' ? '🇰🇷 국내' : '🌏 글로벌'} — ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일</div>
-            <div class="cat-hero-title">${meta.icon} ${meta.title} <span style="font-family:var(--sans);font-size:1.2rem;font-weight:400;opacity:.7">(${meta.en})</span></div>
-            <div class="cat-hero-desc">${meta.desc}</div>
+    <div class="container" style="padding-top:2rem;padding-bottom:0">
+      <div style="background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border-2);border-radius:16px;padding:2.5rem;display:flex;align-items:flex-start;gap:2.5rem;flex-wrap:wrap;margin-bottom:0.75rem">
+        <div class="cat-hero-info">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.9rem">
+            대체투자 뉴스피드 ${currentMode === 'ko' ? '🇰🇷 국내' : '🌏 글로벌'} — ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일
           </div>
-          <div style="display:flex;flex-direction:column;gap:0.8rem;align-self:center;min-width:200px">
-            ${sources.map(s => `
-              <div style="background:rgba(255,255,255,.12);padding:.6rem 1rem;font-size:12px;font-weight:600;letter-spacing:.04em">
-                📰 ${s}
-              </div>`).join('')}
+          <div style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.18;letter-spacing:-0.02em;color:var(--ink);margin-bottom:0.8rem">
+            ${meta.icon} ${meta.title} <span style="font-size:1.1rem;font-weight:400;color:var(--ink-2)">(${meta.en})</span>
           </div>
+          <div class="cat-hero-desc">${meta.desc}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.6rem;align-self:center;min-width:180px">
+          ${sources.slice(0,4).map(s => `
+            <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.15);border-radius:10px;padding:.55rem 1rem;font-size:11.5px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:0.5rem">
+              <span style="color:var(--accent)">📰</span> ${s}
+            </div>`).join('')}
         </div>
       </div>
     </div>
@@ -461,7 +593,7 @@ function renderNews(items, cat) {
           <div class="news-featured-body">
             <div class="news-source-tag">
               <span class="news-source-dot"></span>
-              <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)">${featured.source}</span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--accent)">${featured.source}</span>
               ${featured.sourceType === 'reddit' ? '<span class="source-badge source-reddit">Reddit</span>' : featured.source?.toLowerCase().includes('google') ? '<span class="source-badge source-google">Google News</span>' : ''}
             </div>
             <a class="news-featured-title" href="${featured.link}" target="_blank" rel="noopener">${featured.title}</a>
@@ -473,7 +605,7 @@ function renderNews(items, cat) {
             </div>
           </div>
           <div class="news-featured-side">
-            <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem">관련 기사</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;opacity:.85">관련 기사</div>
             ${sideItems.map(item => `
               <div class="news-side-item">
                 <a class="news-side-title" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
@@ -509,7 +641,7 @@ function renderNews(items, cat) {
     <!-- ALL SECTORS -->
     <div class="sectors-strip">
       <div class="container">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-light);margin-bottom:1rem">전 섹터 뉴스</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;opacity:.85">전 섹터 뉴스</div>
         <div class="sectors-grid">
           ${Object.entries(CAT_META).map(([k, m]) => `
             <div class="sector-tile ${k === cat ? 'active-tile' : ''}" onclick="loadCat('${k}')">
@@ -574,9 +706,10 @@ async function loadCat(cat, mode) {
   const failCount = rssSettled.filter(r => r.status === 'rejected').length;
   if (failCount) console.warn(`[RSS] ${failCount}개 피드 실패 (나머지 정상)`);
 
-  // Merge, deduplicate by title prefix, sort by date
+  // Merge, keyword-filter, deduplicate by title prefix, sort by date
   const seen = new Set();
   const items = [...rssItems, ...redditItems]
+    .filter(item => matchesCategory(item, cat))
     .filter(item => {
       const key = item.title.slice(0, 40).toLowerCase();
       if (seen.has(key)) return false;
@@ -605,5 +738,7 @@ document.addEventListener('click', e => {
 // ── INIT ─────────────────────────────────────────────────────────────────────
 loadCat('alt.PE');
 </script>
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
 </body>
 </html>

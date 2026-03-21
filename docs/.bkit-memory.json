@@ -1,8 +1,12 @@
 {
-  "sessionCount": 4,
+  "sessionCount": 9,
   "lastSession": {
-    "startedAt": "2026-03-21T04:14:35.263Z",
+    "startedAt": "2026-03-21T07:04:23.010Z",
     "platform": "claude",
     "level": "Starter"
-  }
+  },
+  "currentFeature": "supanova-redesign",
+  "phase": "archived",
+  "matchRate": 92,
+  "archivedTo": "docs/archive/2026-03/supanova-redesign/"
 }
