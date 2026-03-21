@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대체투자 뉴스피드 — Alternative Investment News</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink:        #111016;
+      --ink-muted:  #52505a;
+      --ink-light:  #96939e;
+      --paper:      #F9F7F4;
+      --paper-warm: #F2EDE6;
+      --paper-dark: #EDEAE4;
+      --rule:       #D9D4CC;
+      --rule-dark:  #B8B2AA;
+      --accent:     #B83225;
+      --accent-dk:  #8C2519;
+      --accent-lt:  #FAF0EE;
+      --navy:       #0D2240;
+      --navy-lt:    #E8EDF5;
+      --gold:       #9B7D3A;
+      --gold-lt:    #FAF5EB;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans:  'Inter', system-ui, sans-serif;
+      --mono:  'JetBrains Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--paper); color: var(--ink); line-height: 1.65; font-size: 15px; min-height: 100vh; }
+
+    /* ── MASTHEAD ── */
+    .masthead { background: var(--paper); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 0 var(--rule); }
+    .masthead::before { content: ''; display: block; height: 3px; background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dk) 100%); }
+    .masthead-top { display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 2.5rem; border-bottom: 1px solid var(--rule); background: var(--paper-dark); }
+    .issue-info { font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
+    .page-nav { display: flex; gap: 0.5rem; }
+    .page-nav a { font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; text-decoration: none; padding: 0.3rem 0.9rem; border: 1px solid var(--rule-dark); color: var(--ink-muted); transition: all 0.15s; }
+    .page-nav a:hover { border-color: var(--ink); color: var(--ink); }
+    .page-nav a.current { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .masthead-title { text-align: center; padding: 1.6rem 2rem 1.3rem; }
+    .masthead-title::after { content: ''; display: block; width: 60px; height: 2px; background: var(--accent); margin: 0.9rem auto 0; }
+    .magazine-name { font-family: var(--serif); font-size: clamp(2.2rem, 4.5vw, 3.8rem); font-weight: 900; letter-spacing: -0.025em; line-height: 1; color: var(--ink); }
+    .magazine-name span { color: var(--accent); }
+    .magazine-tagline { font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-light); margin-top: 0.5rem; }
+    .masthead-nav { border-bottom: 1px solid var(--rule-dark); background: var(--paper); }
+    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; }
+    .field-tags::-webkit-scrollbar { display: none; }
+    .field-tag { font-size: 11.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); cursor: pointer; text-decoration: none; transition: color 0.18s, border-color 0.18s, background 0.18s; padding: 0.8rem 1.5rem; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .field-tag:hover { color: var(--ink); background: var(--paper-warm); }
+    .field-tag.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+    .field-tag--alt { color: var(--gold); }
+    .field-tag--alt:hover { color: var(--ink); background: var(--gold-lt); }
+    .field-tag--alt.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+
+    /* ── FEED TOGGLE ── */
+    .feed-toggle { display: flex; align-items: center; gap: 0; margin-left: auto; padding: 0 1.5rem; }
+    .feed-toggle-btn { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; border: 1px solid var(--rule-dark); background: transparent; color: var(--ink-light); padding: 0.38rem 0.85rem; transition: all 0.15s; white-space: nowrap; }
+    .feed-toggle-btn:first-child { border-radius: 2px 0 0 2px; }
+    .feed-toggle-btn:last-child { border-radius: 0 2px 2px 0; margin-left: -1px; }
+    .feed-toggle-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .feed-toggle-btn:hover:not(.active) { border-color: var(--ink); color: var(--ink); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2.5rem; }
+
+    /* ── LOADING ── */
+    .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8rem 2rem; gap: 1.2rem; }
+    .loading-spinner { width: 2rem; height: 2rem; border: 1.5px solid var(--rule-dark); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-light); }
+
+    /* ── TICKER ── */
+    .ticker-wrap { background: var(--navy); overflow: hidden; height: 2.2rem; display: flex; align-items: center; }
+    .ticker-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); padding: 0 1.2rem; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; }
+    .ticker-track { display: flex; gap: 3.5rem; animation: ticker 45s linear infinite; white-space: nowrap; padding-left: 2rem; }
+    .ticker-track:hover { animation-play-state: paused; }
+    .ticker-item { font-size: 11.5px; color: rgba(255,255,255,0.65); font-weight: 400; }
+    .ticker-item span { color: rgba(255,255,255,0.3); margin-right: 0.5rem; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── HERO BANNER ── */
+    .cat-hero { color: #fff; padding: 3rem 0; }
+    .cat-hero-inner { display: flex; align-items: flex-start; gap: 3rem; flex-wrap: wrap; }
+    .cat-hero-info { flex: 1; min-width: 280px; }
+    .cat-hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.6; margin-bottom: 0.8rem; }
+    .cat-hero-title { font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; line-height: 1.12; margin-bottom: 0.9rem; }
+    .cat-hero-desc { font-size: 15px; line-height: 1.72; opacity: 0.8; max-width: 48ch; }
+
+    /* ── NEWS SECTION ── */
+    .news-section { padding: 2.5rem 0; }
+    .section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.8rem; padding-bottom: 0.65rem; border-bottom: 1.5px solid var(--ink); }
+    .section-title { font-family: var(--serif); font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+    .section-meta { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-left: auto; }
+
+    /* Featured */
+    .news-featured { display: grid; grid-template-columns: 3fr 2fr; border: 1px solid var(--rule-dark); margin-bottom: 2.5rem; }
+    .news-featured-body { padding: 2.5rem; border-right: 1px solid var(--rule); }
+    .news-featured-side { padding: 2rem; background: var(--paper-warm); display: flex; flex-direction: column; gap: 1.4rem; }
+    .news-source-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1rem; }
+    .news-source-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+    .news-featured-title { font-family: var(--serif); font-size: clamp(1.3rem, 2.2vw, 1.85rem); font-weight: 700; line-height: 1.22; margin-bottom: 1rem; color: var(--ink); text-decoration: none; display: block; }
+    .news-featured-title:hover { color: var(--accent); }
+    .news-featured-desc { font-size: 14px; line-height: 1.75; color: var(--ink-muted); margin-bottom: 1.2rem; }
+    .news-meta { font-size: 10.5px; color: var(--ink-light); display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .news-meta a { color: var(--accent); font-weight: 700; text-decoration: none; font-size: 11px; letter-spacing: 0.06em; }
+    .news-side-item { padding-bottom: 1.3rem; border-bottom: 1px solid var(--rule); }
+    .news-side-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .news-side-title { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; line-height: 1.32; color: var(--ink); text-decoration: none; display: block; margin-bottom: 0.3rem; }
+    .news-side-title:hover { color: var(--accent); }
+    .news-side-meta { font-size: 10.5px; color: var(--ink-light); }
+
+    /* News grid */
+    .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); margin-bottom: 2.5rem; }
+    .news-card { background: var(--paper); padding: 1.6rem; display: flex; flex-direction: column; gap: 0.55rem; transition: background 0.12s; border-left: 2px solid transparent; }
+    .news-card:hover { background: var(--accent-lt); border-left-color: var(--accent); }
+    .news-card-num { font-family: var(--mono); font-size: 10px; color: var(--rule-dark); }
+    .news-card-title { font-family: var(--serif); font-size: 0.97rem; font-weight: 700; line-height: 1.38; color: var(--ink); text-decoration: none; flex: 1; }
+    .news-card-title:hover { color: var(--accent); }
+    .news-card-desc { font-size: 12px; line-height: 1.58; color: var(--ink-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .news-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: var(--ink-light); margin-top: auto; padding-top: 0.6rem; border-top: 1px solid var(--rule); }
+    .news-card-source { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); }
+
+    /* Sectors strip */
+    .sectors-strip { background: var(--paper-dark); padding: 2.5rem 0; border-top: 1.5px solid var(--rule-dark); margin-top: 1rem; }
+    .sectors-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--rule-dark); }
+    .sector-tile { background: var(--paper); padding: 1.4rem 1rem; cursor: pointer; transition: background 0.12s, color 0.12s; text-align: center; }
+    .sector-tile:hover { background: var(--gold-lt); }
+    .sector-tile.active-tile { background: var(--ink); color: #fff; }
+    .sector-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .sector-name { font-size: 13px; font-weight: 700; }
+    .sector-en { font-size: 9.5px; opacity: 0.55; margin-top: 0.25rem; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    /* Source Badge */
+    .source-badge { display: inline-block; font-size: 8.5px; padding: 1px 5px; border-radius: 2px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-left: 0.4rem; vertical-align: middle; }
+    .source-reddit  { background: #FF4500; color: #fff; }
+    .source-google  { background: #4285F4; color: #fff; }
+    .source-naver   { background: #03C75A; color: #fff; }
+    .source-rss     { background: var(--ink-light); color: #fff; }
+
+    /* Error */
+    .error-state { text-align: center; padding: 5rem 2rem; color: var(--ink-muted); }
+    .error-state h3 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.5rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.3rem; background: var(--ink); color: var(--paper); font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; border: 1.5px solid var(--ink); cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .btn:hover { background: var(--accent); border-color: var(--accent); }
+
+    /* Footer */
+    footer { background: var(--ink); color: var(--paper); padding: 3rem 0; margin-top: 0; }
+    .footer-inner { text-align: center; }
+    .footer-name { font-family: var(--serif); font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.6rem; }
+    .footer-name span { color: var(--accent); }
+    .footer-note { font-size: 12px; line-height: 1.7; max-width: 50ch; margin: 0 auto 1.2rem; color: rgba(255,255,255,0.38); }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+    .footer-link { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.42); text-decoration: none; }
+    .footer-link:hover { color: #fff; }
+
+    @media (max-width: 1024px) { .sectors-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px) {
+      .news-featured { grid-template-columns: 1fr; }
+      .news-featured-body { border-right: none; border-bottom: 1px solid var(--rule); }
+      .news-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .container { padding: 0 1.2rem; }
+      .masthead-top { display: none; }
+      .news-grid { grid-template-columns: 1fr; }
+      .sectors-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-top container">
+    <div class="issue-info" id="issue-info">뉴스 피드 로딩 중...</div>
+    <nav class="page-nav">
+      <a href="index.html">리서치 논문</a>
+      <a class="current" href="news.html">뉴스 피드</a>
+    </nav>
+  </div>
+  <div class="masthead-title">
+    <div class="magazine-name">대체투자 <span>뉴스피드</span></div>
+    <div class="magazine-tagline">Alternative Investment News — RSS Live Feed · Private Equity · Real Estate · Infrastructure · Hedge Fund · VC</div>
+  </div>
+  <div class="masthead-nav">
+    <nav class="field-tags container">
+      <a class="field-tag field-tag--alt active" data-cat="alt.PE" href="#">사모펀드</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.RE" href="#">부동산</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.INF" href="#">인프라</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.HF" href="#">헤지펀드</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.VC" href="#">벤처캐피탈</a>
+      <div class="feed-toggle">
+        <button class="feed-toggle-btn active" id="btn-global" onclick="setMode('global')">🌏 글로벌</button>
+        <button class="feed-toggle-btn" id="btn-ko" onclick="setMode('ko')">🇰🇷 국내</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- TICKER (static placeholder, filled by JS) -->
+<div class="ticker-wrap">
+  <div class="ticker-label">실시간</div>
+  <div class="ticker-track" id="ticker-track">
+    <div class="ticker-item"><span>●</span>뉴스 피드 로딩 중...</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="app">
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">RSS 피드 수신 중...</div>
+  </div>
+</div>
+
+<script>
+// ── RSS FEED SOURCES (Google News RSS — 무료, 안정적) ─────────────────────────
+const GN = (q, lang = 'en', country = 'US') =>
+  `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=${lang}&gl=${country}&ceid=${country}:${lang}`;
+
+const FEEDS = {
+  'alt.PE': [
+    { label: 'Google News',    url: GN('private equity buyout M&A fund') },
+    { label: 'Google News',    url: GN('LBO leveraged buyout secondary market PE') },
+    { label: 'TechCrunch',     url: 'https://techcrunch.com/feed/' },
+  ],
+  'alt.RE': [
+    { label: 'Google News',    url: GN('real estate investment REIT commercial') },
+    { label: 'Google News',    url: GN('real estate data center logistics property') },
+    { label: 'CNBC RE',        url: 'https://www.cnbc.com/id/10000115/device/rss/rss.html' },
+  ],
+  'alt.INF': [
+    { label: 'Google News',    url: GN('infrastructure fund energy transition renewable investment') },
+    { label: 'Google News',    url: GN('digital infrastructure data center fiber tower investment') },
+    { label: 'CNBC Energy',    url: 'https://www.cnbc.com/id/10000113/device/rss/rss.html' },
+  ],
+  'alt.HF': [
+    { label: 'Google News',    url: GN('hedge fund strategy alpha quantitative systematic') },
+    { label: 'Google News',    url: GN('global macro hedge fund geopolitical risk') },
+    { label: 'CNBC Finance',   url: 'https://www.cnbc.com/id/15839135/device/rss/rss.html' },
+  ],
+  'alt.VC': [
+    { label: 'TechCrunch VC',  url: 'https://techcrunch.com/category/venture/feed/' },
+    { label: 'Google News',    url: GN('venture capital startup AI funding Series') },
+    { label: 'Google News',    url: GN('startup unicorn IPO exit climate tech deeptech') },
+  ],
+};
+
+// ── KOREAN DOMESTIC FEEDS (네이버 뉴스 RSS + Google News KR) ─────────────────
+const GN_KO = (q) =>
+  `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=ko&gl=KR&ceid=KR:ko`;
+
+const FEEDS_KO = {
+  'alt.PE': [
+    { label: 'Google News KR', url: GN_KO('사모펀드 PEF 바이아웃') },
+    { label: '한국경제',        url: 'https://www.hankyung.com/feed/finance' },
+    { label: '매일경제',        url: 'https://www.mk.co.kr/rss/30200030/' },
+  ],
+  'alt.RE': [
+    { label: 'Google News KR', url: GN_KO('부동산 투자 REIT 리츠') },
+    { label: '한국경제 부동산',  url: 'https://www.hankyung.com/feed/realestate' },
+    { label: '조선비즈',        url: 'https://biz.chosun.com/arc/outboundfeeds/rss/?outputType=xml' },
+  ],
+  'alt.INF': [
+    { label: 'Google News KR', url: GN_KO('인프라 투자 에너지전환 재생에너지') },
+    { label: '한국경제',        url: 'https://www.hankyung.com/feed/finance' },
+    { label: '헤럴드경제',      url: 'https://biz.heraldcorp.com/common_prog/rssdisp.php?ct=010' },
+  ],
+  'alt.HF': [
+    { label: 'Google News KR', url: GN_KO('헤지펀드 퀀트 매크로 전략') },
+    { label: '한국경제 증권',   url: 'https://www.hankyung.com/feed/finance' },
+    { label: '매일경제 금융',   url: 'https://www.mk.co.kr/rss/30200030/' },
+  ],
+  'alt.VC': [
+    { label: 'Google News KR', url: GN_KO('벤처캐피탈 스타트업 투자 VC') },
+    { label: '한국경제 IT',     url: 'https://www.hankyung.com/feed/it' },
+    { label: '조선비즈',        url: 'https://biz.chosun.com/arc/outboundfeeds/rss/?outputType=xml' },
+  ],
+};
+
+const CAT_META = {
+  'alt.PE':  { title: '사모펀드', en: 'Private Equity',    color: '#7d6608', bg: '#fef9e7', icon: '🏦',
+    desc: '바이아웃 · M&A · 기업 구조조정 관련 최신 뉴스' },
+  'alt.RE':  { title: '부동산',   en: 'Real Estate',        color: '#1e8449', bg: '#eafaf1', icon: '🏢',
+    desc: '오피스 · 물류 · REIT · 데이터센터 부동산 시장 동향' },
+  'alt.INF': { title: '인프라',   en: 'Infrastructure',     color: '#1a5276', bg: '#eaf2fb', icon: '⚡',
+    desc: '에너지 전환 · 재생에너지 · 디지털 인프라 투자 동향' },
+  'alt.HF':  { title: '헤지펀드', en: 'Hedge Fund',         color: '#6c3483', bg: '#f4ecf7', icon: '📊',
+    desc: '퀀트 · 매크로 · 이벤트드리븐 전략 및 시장 동향' },
+  'alt.VC':  { title: '벤처캐피탈', en: 'Venture Capital',  color: '#922b21', bg: '#fdedec', icon: '🚀',
+    desc: 'AI · 바이오 · 기후테크 스타트업 펀딩 및 엑싯 뉴스' },
+};
+
+// ── RSS PROXY (rss2json — 안정적, JSON 직접 반환) ────────────────────────────
+const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+async function fetchFeed(feedUrl, label) {
+  try {
+    const res = await fetch(RSS2JSON_API + encodeURIComponent(feedUrl));
+    if (!res.ok) { console.warn('[RSS] rss2json error:', res.status, feedUrl); return []; }
+    const json = await res.json();
+    if (json.status !== 'ok') { console.warn('[RSS] rss2json status:', json.message, feedUrl); return []; }
+    return (json.items || []).map(item => ({
+      title:   (item.title || '').trim(),
+      link:    item.link || item.guid || '#',
+      desc:    stripHtml(item.description || item.content || '').slice(0, 280),
+      pubDate: item.pubDate || '',
+      source:  json.feed?.title || label || feedUrl,
+      sourceType: 'rss',
+    })).filter(i => i.title);
+  } catch (e) {
+    console.warn('[RSS] fetch failed:', feedUrl, e.message);
+    return [];
+  }
+}
+
+// ── REDDIT RSS (직접 접근, Atom 포맷) ─────────────────────────────────────────
+const REDDIT_FEEDS = {
+  'alt.PE':  'https://www.reddit.com/r/privateequity+investing+finance/.rss?limit=15',
+  'alt.RE':  'https://www.reddit.com/r/realestateinvesting+RealEstate/.rss?limit=15',
+  'alt.INF': 'https://www.reddit.com/r/investing+RenewableEnergy+energy/.rss?limit=15',
+  'alt.HF':  'https://www.reddit.com/r/algotrading+quant+wallstreetbets/.rss?limit=15',
+  'alt.VC':  'https://www.reddit.com/r/startups+venturecapital+Entrepreneur/.rss?limit=15',
+};
+
+async function fetchReddit(cat) {
+  const url = REDDIT_FEEDS[cat];
+  if (!url) return [];
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': 'AltInvestMag/1.0' } });
+    if (!res.ok) { console.warn('[Reddit] error:', res.status); return []; }
+    const xml = new DOMParser().parseFromString(await res.text(), 'application/xml');
+    const entries = [...xml.querySelectorAll('entry')];
+    return entries.map(e => ({
+      title:   (e.querySelector('title')?.textContent || '').trim(),
+      link:    e.querySelector('link')?.getAttribute('href') || '#',
+      desc:    stripHtml(e.querySelector('content')?.textContent || '').slice(0, 280),
+      pubDate: e.querySelector('updated')?.textContent || '',
+      source:  'Reddit',
+      sourceType: 'reddit',
+    })).filter(i => i.title && !i.title.startsWith('r/'));
+  } catch (e) {
+    console.warn('[Reddit] fetch failed:', e.message);
+    return [];
+  }
+}
+
+function stripHtml(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return d.textContent.replace(/\s+/g, ' ').trim().slice(0, 280);
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr.slice(0, 16);
+  const diff = Date.now() - d.getTime();
+  const h = Math.floor(diff / 3600000);
+  if (h < 1) return `${Math.floor(diff / 60000)}분 전`;
+  if (h < 24) return `${h}시간 전`;
+  return `${Math.floor(h / 24)}일 전`;
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+let currentCat = 'alt.PE';
+let currentMode = 'global';  // 'global' | 'ko'
+let allItems = [];
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-global').classList.toggle('active', mode === 'global');
+  document.getElementById('btn-ko').classList.toggle('active', mode === 'ko');
+  loadCat(currentCat, mode);
+}
+
+function renderNews(items, cat) {
+  currentCat = cat;
+  const meta = CAT_META[cat];
+  const now = new Date();
+
+  document.getElementById('issue-info').textContent =
+    `${meta.title} 뉴스 · ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+
+  if (!items.length) {
+    document.getElementById('app').innerHTML = `
+      <div class="container">
+        <div class="error-state">
+          <div style="font-size:2rem;margin-bottom:1rem">📡</div>
+          <h3>RSS 피드를 불러올 수 없습니다</h3>
+          <p style="color:var(--ink-muted);margin-bottom:1.5rem">네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.</p>
+          <button class="btn" onclick="loadCat('${cat}')">↺ 다시 시도</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Ticker
+  const tickerHTML = [...items, ...items].map(i =>
+    `<div class="ticker-item"><span>●</span>${i.title.slice(0, 60)}${i.title.length > 60 ? '…' : ''}</div>`
+  ).join('');
+  document.getElementById('ticker-track').innerHTML = tickerHTML;
+
+  const featured = items[0];
+  const sideItems = items.slice(1, 5);
+  const gridItems = items.slice(5, 20);
+
+  // Group sources
+  const sources = [...new Set(items.map(i => i.source))];
+
+  document.getElementById('app').innerHTML = `
+
+    <!-- HERO BANNER -->
+    <div class="cat-hero" style="background:${meta.color}">
+      <div class="container">
+        <div class="cat-hero-inner">
+          <div class="cat-hero-info">
+            <div class="cat-hero-label">대체투자 뉴스피드 ${currentMode === 'ko' ? '🇰🇷 국내' : '🌏 글로벌'} — ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일</div>
+            <div class="cat-hero-title">${meta.icon} ${meta.title} <span style="font-family:var(--sans);font-size:1.2rem;font-weight:400;opacity:.7">(${meta.en})</span></div>
+            <div class="cat-hero-desc">${meta.desc}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.8rem;align-self:center;min-width:200px">
+            ${sources.map(s => `
+              <div style="background:rgba(255,255,255,.12);padding:.6rem 1rem;font-size:12px;font-weight:600;letter-spacing:.04em">
+                📰 ${s}
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN NEWS -->
+    <div class="container">
+      <section class="news-section">
+        <div class="section-header">
+          <h2 class="section-title">주요 뉴스</h2>
+          <span class="section-meta">${items.length}건 · ${sources.join(' · ')}</span>
+        </div>
+
+        <!-- Featured + Side -->
+        <div class="news-featured">
+          <div class="news-featured-body">
+            <div class="news-source-tag">
+              <span class="news-source-dot"></span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)">${featured.source}</span>
+              ${featured.sourceType === 'reddit' ? '<span class="source-badge source-reddit">Reddit</span>' : featured.source?.toLowerCase().includes('google') ? '<span class="source-badge source-google">Google News</span>' : ''}
+            </div>
+            <a class="news-featured-title" href="${featured.link}" target="_blank" rel="noopener">${featured.title}</a>
+            <p class="news-featured-desc">${featured.desc || '기사 본문을 확인하려면 제목을 클릭하세요.'}</p>
+            <div class="news-meta">
+              <span>🕐 ${timeAgo(featured.pubDate)}</span>
+              <span>${featured.pubDate ? new Date(featured.pubDate).toLocaleDateString('ko-KR') : ''}</span>
+              <a href="${featured.link}" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;text-decoration:none;margin-left:auto">전문 보기 →</a>
+            </div>
+          </div>
+          <div class="news-featured-side">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem">관련 기사</div>
+            ${sideItems.map(item => `
+              <div class="news-side-item">
+                <a class="news-side-title" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+                <div class="news-side-meta">${item.source} · ${timeAgo(item.pubDate)}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Grid -->
+        ${gridItems.length ? `
+        <div class="section-header" style="margin-top:2rem">
+          <h2 class="section-title">최신 기사</h2>
+          <span class="section-meta">${gridItems.length}건</span>
+        </div>
+        <div class="news-grid">
+          ${gridItems.map((item, i) => `
+            <div class="news-card">
+              <div class="news-card-num">${String(i + 1).padStart(2, '0')}</div>
+              <a class="news-card-title" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+              ${item.desc ? `<p class="news-card-desc">${item.desc}</p>` : ''}
+              <div class="news-card-footer">
+                <span class="news-card-source">
+                  ${item.source}
+                  ${item.sourceType === 'reddit' ? '<span class="source-badge source-reddit">Reddit</span>' : item.source?.toLowerCase().includes('google') ? '<span class="source-badge source-google">GN</span>' : ''}
+                </span>
+                <span>${timeAgo(item.pubDate)}</span>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
+      </section>
+    </div>
+
+    <!-- ALL SECTORS -->
+    <div class="sectors-strip">
+      <div class="container">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-light);margin-bottom:1rem">전 섹터 뉴스</div>
+        <div class="sectors-grid">
+          ${Object.entries(CAT_META).map(([k, m]) => `
+            <div class="sector-tile ${k === cat ? 'active-tile' : ''}" onclick="loadCat('${k}')">
+              <div class="sector-icon">${m.icon}</div>
+              <div class="sector-name" style="${k === cat ? '' : ''}">${m.title}</div>
+              <div class="sector-en">${m.en}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <div class="footer-name">대체투자 <span>뉴스피드</span></div>
+          <p class="footer-note">Google News · CNBC · TechCrunch · Reddit (글로벌) · 한국경제, 매일경제, 조선비즈 (국내) RSS를 실시간 집계합니다.</p>
+          <div class="footer-links">
+            ${Object.entries(CAT_META).map(([k, m]) =>
+              `<a class="footer-link" href="#" onclick="loadCat('${k}');return false">${m.title}</a>`
+            ).join('')}
+            <a class="footer-link" href="index.html">리서치 논문</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  `;
+}
+
+// ── LOAD ─────────────────────────────────────────────────────────────────────
+async function loadCat(cat, mode) {
+  currentCat = cat;
+  if (mode) currentMode = mode;
+
+  // nav active
+  document.querySelectorAll('.field-tag').forEach(t =>
+    t.classList.toggle('active', t.dataset.cat === cat)
+  );
+
+  const meta = CAT_META[cat];
+  const modeLabel = currentMode === 'ko' ? '🇰🇷 국내' : '🌏 글로벌';
+  document.getElementById('app').innerHTML = `
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">${meta.title} ${modeLabel} RSS 피드 수신 중...</div>
+    </div>`;
+
+  const feedMap = currentMode === 'ko' ? FEEDS_KO : FEEDS;
+  const feeds = feedMap[cat] || [];
+
+  // 병렬 로딩 — 실패해도 다른 소스는 정상 표시 (graceful degradation)
+  const [rssSettled, redditItems] = await Promise.all([
+    Promise.allSettled(feeds.map(f => fetchFeed(f.url, f.label))),
+    fetchReddit(cat),
+  ]);
+
+  const rssItems = rssSettled
+    .filter(r => r.status === 'fulfilled')
+    .flatMap(r => r.value);
+
+  // 실패한 피드 수 로그
+  const failCount = rssSettled.filter(r => r.status === 'rejected').length;
+  if (failCount) console.warn(`[RSS] ${failCount}개 피드 실패 (나머지 정상)`);
+
+  // Merge, deduplicate by title prefix, sort by date
+  const seen = new Set();
+  const items = [...rssItems, ...redditItems]
+    .filter(item => {
+      const key = item.title.slice(0, 40).toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => {
+      const da = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+      const db = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+      return db - da;
+    });
+
+  allItems = items;
+  renderNews(items, cat);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── NAV CLICK ─────────────────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const tag = e.target.closest('.field-tag');
+  if (!tag || !tag.dataset.cat) return;
+  e.preventDefault();
+  loadCat(tag.dataset.cat);
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+loadCat('alt.PE');
+</script>
+</body>
+</html>

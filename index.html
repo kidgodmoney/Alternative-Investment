@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대체투자 인사이트 — Alternative Investment Research Magazine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #111016;
+      --ink-muted:  #52505a;
+      --ink-light:  #96939e;
+      --paper:      #F9F7F4;
+      --paper-warm: #F2EDE6;
+      --paper-dark: #EDEAE4;
+      --rule:       #D9D4CC;
+      --rule-dark:  #B8B2AA;
+      --accent:     #B83225;
+      --accent-dk:  #8C2519;
+      --accent-lt:  #FAF0EE;
+      --navy:       #0D2240;
+      --navy-lt:    #E8EDF5;
+      --gold:       #9B7D3A;
+      --gold-lt:    #FAF5EB;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans:  'Inter', system-ui, sans-serif;
+      --mono:  'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.65;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* ── MASTHEAD ── */
+    .masthead {
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 0 var(--rule);
+    }
+
+    /* 상단 빨간 줄 — FT 스타일 */
+    .masthead::before {
+      content: '';
+      display: block;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dk) 100%);
+    }
+
+    .masthead-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 2rem;
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper-dark);
+    }
+
+    .issue-info {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .page-nav { display: flex; gap: 0.5rem; align-items: center; }
+    .page-nav a {
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; text-decoration: none;
+      padding: 0.3rem 0.9rem; border: 1px solid var(--rule-dark);
+      color: var(--ink-muted); transition: all 0.15s;
+    }
+    .page-nav a:hover { border-color: var(--ink); color: var(--ink); }
+    .page-nav a.current { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+    .masthead-title {
+      text-align: center;
+      padding: 1.6rem 2rem 1.3rem;
+      position: relative;
+    }
+    .masthead-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: var(--accent);
+      margin: 0.9rem auto 0;
+    }
+
+    .magazine-name {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .magazine-name span { color: var(--accent); }
+
+    .magazine-tagline {
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-top: 0.5rem;
+    }
+
+    .masthead-nav {
+      border-bottom: 1px solid var(--rule-dark);
+      background: var(--paper);
+    }
+
+    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; }
+    .field-tags::-webkit-scrollbar { display: none; }
+
+    .field-tag {
+      font-size: 11.5px; font-weight: 600; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--ink-light);
+      cursor: pointer; text-decoration: none;
+      transition: color 0.18s, border-color 0.18s, background 0.18s;
+      padding: 0.8rem 1.5rem;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+    .field-tag:hover { color: var(--ink); background: var(--paper-warm); }
+    .field-tag.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+    .field-tag--alt { color: var(--gold); }
+    .field-tag--alt:hover { color: var(--ink); background: var(--gold-lt); }
+    .field-tag--alt.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2.5rem; }
+
+    /* ── LOADING ── */
+    .loading-screen {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 8rem 2rem; gap: 1.2rem;
+    }
+    .loading-spinner {
+      width: 2rem; height: 2rem;
+      border: 1.5px solid var(--rule-dark);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      font-size: 11px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-light);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      border-bottom: 1px solid var(--rule-dark);
+      min-height: 500px;
+    }
+    .hero-main {
+      padding: 3rem 3rem 3rem 0;
+      border-right: 1px solid var(--rule);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hero-label {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: #fff;
+      background: var(--accent); padding: 0.3rem 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(1.7rem, 3vw, 2.8rem);
+      font-weight: 700; line-height: 1.18; letter-spacing: -0.015em;
+      margin-bottom: 1.2rem; color: var(--ink);
+    }
+    .hero-abstract {
+      font-size: 15.5px; line-height: 1.78;
+      color: var(--ink-muted); margin-bottom: 2rem; max-width: 62ch;
+    }
+    .hero-meta { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .hero-authors { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .hero-date { font-size: 11.5px; color: var(--ink-light); font-family: var(--mono); }
+    .hero-link {
+      margin-left: auto; display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      text-decoration: none; padding-bottom: 2px;
+      border-bottom: 1.5px solid var(--accent);
+    }
+    .hero-link:hover { color: var(--accent-dk); border-bottom-color: var(--accent-dk); }
+
+    .hero-sidebar { padding: 2.5rem 0 2.5rem 2.5rem; display: flex; flex-direction: column; }
+    .sidebar-insight { padding: 1.4rem 0; border-bottom: 1px solid var(--rule); }
+    .sidebar-insight:last-child { border-bottom: none; }
+    .insight-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;
+    }
+    .insight-text {
+      font-family: var(--serif); font-size: 14.5px;
+      font-style: italic; line-height: 1.55; color: var(--ink);
+    }
+
+    /* ── SECTION ── */
+    .section { padding: 3rem 0; border-bottom: 1px solid var(--rule); }
+    .section-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 2rem; border-bottom: 1.5px solid var(--ink);
+      padding-bottom: 0.7rem;
+    }
+    .section-title {
+      font-family: var(--serif); font-size: 1.35rem;
+      font-weight: 700; letter-spacing: -0.01em;
+    }
+    .section-count {
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-light);
+    }
+
+    /* ── PAPER GRID ── */
+    .paper-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--rule);
+    }
+    .paper-card {
+      background: var(--paper); padding: 1.8rem;
+      display: flex; flex-direction: column; gap: 0.85rem;
+      cursor: pointer; transition: background 0.15s, transform 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .paper-card:hover {
+      background: var(--accent-lt);
+      border-left-color: var(--accent);
+    }
+    .paper-number {
+      font-family: var(--mono); font-size: 10.5px;
+      font-weight: 500; color: var(--rule-dark);
+    }
+    .paper-categories { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .paper-cat {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem;
+      background: var(--navy-lt); color: var(--navy);
+    }
+    .paper-cat.cs-ai  { background: #fef5dc; color: #7a5c00; }
+    .paper-cat.cs-lg  { background: #dff0f5; color: #0b4d5e; }
+    .paper-cat.cs-cv  { background: #dff5e8; color: #145229; }
+    .paper-cat.cs-cl  { background: #fde8ea; color: #6b1820; }
+    .paper-cat.cs-ro  { background: #ede0f5; color: #3f2470; }
+    .paper-cat.stat-ml{ background: #fde0e3; color: #6b1838; }
+    .paper-cat.alt-pe { background: #fef8e4; color: #6b5500; }
+    .paper-cat.alt-re { background: #e6f5ed; color: #1a6e3e; }
+    .paper-cat.alt-inf{ background: #e4eef8; color: #154570; }
+    .paper-cat.alt-hf { background: #f0e8f5; color: #5c2b72; }
+    .paper-cat.alt-vc { background: #fde8e6; color: #7c2218; }
+
+    .paper-title {
+      font-family: var(--serif); font-size: 1.0rem; font-weight: 700;
+      line-height: 1.4; letter-spacing: -0.005em; color: var(--ink);
+    }
+    .paper-abstract {
+      font-size: 13px; line-height: 1.72; color: var(--ink-muted);
+      display: -webkit-box; -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .paper-footer {
+      margin-top: auto; display: flex; align-items: center;
+      justify-content: space-between; padding-top: 0.8rem;
+      border-top: 1px solid var(--rule);
+    }
+    .paper-authors { font-size: 11.5px; font-weight: 500; color: var(--ink-muted); }
+    .paper-date { font-family: var(--mono); font-size: 10.5px; color: var(--ink-light); }
+
+    /* ── INSIGHTS STRIP ── */
+    .insights-strip { background: var(--ink); color: var(--paper); padding: 3rem 0; }
+    .insights-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .insight-card {
+      padding: 0 2.5rem;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .insight-card:first-child { padding-left: 0; }
+    .insight-card:last-child { border-right: none; }
+    .insight-num {
+      font-family: var(--mono); font-size: 2.2rem; font-weight: 700;
+      color: var(--accent); line-height: 1; margin-bottom: 0.5rem;
+    }
+    .insight-desc {
+      font-size: 11.5px; letter-spacing: 0.04em; line-height: 1.55;
+      color: rgba(255,255,255,0.5); text-transform: uppercase;
+    }
+
+    /* ── TRENDING ── */
+    .trends-layout { display: grid; grid-template-columns: 1fr 300px; gap: 3rem; }
+    .trend-list { display: flex; flex-direction: column; }
+    .trend-item {
+      display: grid; grid-template-columns: 2.2rem 1fr;
+      gap: 1.2rem; padding: 1.4rem 0;
+      border-bottom: 1px solid var(--rule);
+      align-items: start; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .trend-item:hover { background: var(--accent-lt); padding: 1.4rem 0.8rem; margin: 0 -0.8rem; }
+    .trend-rank {
+      font-family: var(--serif); font-size: 1.9rem; font-weight: 700;
+      color: var(--rule-dark); line-height: 1.1; text-align: center;
+    }
+    .trend-title {
+      font-family: var(--serif); font-size: 1rem; font-weight: 700;
+      line-height: 1.35; margin-bottom: 0.35rem;
+    }
+    .trend-excerpt {
+      font-size: 12.5px; color: var(--ink-muted); line-height: 1.6;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .trend-meta { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.5rem; }
+    .trend-arxiv-id {
+      font-family: var(--mono); font-size: 10.5px; color: var(--accent); text-decoration: none;
+    }
+    .trend-arxiv-id:hover { text-decoration: underline; }
+
+    /* ── WIDGETS ── */
+    .widget { border: 1px solid var(--rule-dark); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .widget-title {
+      font-family: var(--serif); font-size: 0.95rem; font-weight: 700;
+      letter-spacing: 0.03em; border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.6rem; margin-bottom: 1rem;
+    }
+    .topic-list { list-style: none; }
+    .topic-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; border-bottom: 1px dotted var(--rule);
+      font-size: 13px; cursor: pointer;
+    }
+    .topic-item:last-child { border-bottom: none; }
+    .topic-item:hover .topic-name { color: var(--accent); }
+    .topic-name { font-weight: 500; }
+    .topic-count {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--ink-light); background: var(--paper-warm); padding: 0.1rem 0.45rem;
+    }
+
+    /* ── PULLQUOTE ── */
+    .pullquote {
+      border-left: 3px solid var(--accent); padding: 1.4rem 2rem;
+      background: var(--accent-lt); margin: 2rem 0;
+    }
+    .pullquote-text {
+      font-family: var(--serif); font-size: 1.1rem;
+      font-style: italic; line-height: 1.62; color: var(--ink);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,8,12,0.72);
+      backdrop-filter: blur(3px);
+      z-index: 1000; display: flex; align-items: center;
+      justify-content: center; padding: 2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--paper); max-width: 780px; width: 100%;
+      max-height: 88vh; overflow-y: auto;
+      border: 1px solid var(--rule-dark);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      background: var(--ink); color: var(--paper);
+      padding: 1.6rem 2rem; display: flex;
+      justify-content: space-between; align-items: start;
+      position: sticky; top: 0;
+    }
+    .modal-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: #e06b5a; margin-bottom: 0.5rem;
+    }
+    .modal-title {
+      font-family: var(--serif); font-size: 1.28rem;
+      font-weight: 700; line-height: 1.32; max-width: 580px;
+    }
+    .modal-close {
+      background: none; border: none; color: rgba(255,255,255,0.55);
+      font-size: 1.4rem; cursor: pointer; padding: 0.2rem 0.4rem;
+      line-height: 1; flex-shrink: 0; transition: color 0.15s;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-body { padding: 2rem; }
+    .modal-meta {
+      display: flex; gap: 2rem; flex-wrap: wrap;
+      padding-bottom: 1.5rem; border-bottom: 1px solid var(--rule);
+      margin-bottom: 1.5rem;
+    }
+    .modal-meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .modal-meta-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-light);
+    }
+    .modal-meta-value { font-size: 13px; font-weight: 500; color: var(--ink); }
+    .modal-section-title {
+      font-family: var(--serif); font-size: 1rem;
+      font-weight: 700; margin: 1.5rem 0 0.8rem;
+    }
+    .modal-abstract { font-size: 14px; line-height: 1.82; color: var(--ink-muted); }
+    .insight-points { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+    .insight-point { display: flex; gap: 0.8rem; font-size: 13.5px; line-height: 1.62; }
+    .insight-point::before { content: '→'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    .modal-actions {
+      display: flex; gap: 0.8rem; margin-top: 2rem;
+      padding-top: 1.5rem; border-top: 1px solid var(--rule);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.65rem 1.3rem;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; text-decoration: none; cursor: pointer;
+      border: 1.5px solid var(--ink); background: var(--ink);
+      color: var(--paper); transition: all 0.15s;
+    }
+    .btn:hover { background: var(--accent); border-color: var(--accent); }
+    .btn-outline { background: transparent; color: var(--ink); }
+    .btn-outline:hover { background: var(--ink); color: var(--paper); }
+
+    /* ── ERROR ── */
+    .error-state { padding: 4rem 2rem; text-align: center; color: var(--ink-muted); }
+    .error-state h3 { font-family: var(--serif); font-size: 1.3rem; margin-bottom: 0.5rem; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--ink); color: var(--paper); padding: 3rem 0; margin-top: 4rem; }
+    .footer-inner {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 1.5rem;
+    }
+    .footer-name { font-family: var(--serif); font-size: 1.4rem; font-weight: 900; }
+    .footer-name span { color: var(--accent); }
+    .footer-note { font-size: 12px; color: rgba(255,255,255,0.38); max-width: 380px; line-height: 1.65; }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-link {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
+      text-transform: uppercase; color: rgba(255,255,255,0.45); text-decoration: none;
+    }
+    .footer-link:hover { color: var(--paper); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-sidebar { border-top: 1px solid var(--rule); padding: 2rem 0; }
+      .hero-main { padding: 2.5rem 0; border-right: none; }
+      .paper-grid { grid-template-columns: repeat(2, 1fr); }
+      .insights-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+      .insight-card { border-right: none; padding: 0; }
+      .trends-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .container { padding: 0 1.2rem; }
+      .masthead-top { display: none; }
+      .paper-grid { grid-template-columns: 1fr; }
+      .insights-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-top container">
+    <div class="issue-info" id="issue-info">Loading...</div>
+    <div class="page-nav">
+      <a class="current" href="index.html">리서치 논문</a>
+      <a href="news.html">뉴스 피드</a>
+    </div>
+  </div>
+  <div class="masthead-title">
+    <div class="magazine-name">대체투자 <span>인사이트</span></div>
+    <div class="magazine-tagline">Alternative Investment Research — Private Equity · Real Estate · Infrastructure · Hedge Fund · Venture Capital</div>
+  </div>
+  <div class="masthead-nav">
+    <nav class="field-tags container">
+      <a class="field-tag field-tag--alt active" data-cat="alt.PE" href="#">사모펀드</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.RE" href="#">부동산</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.INF" href="#">인프라</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.HF" href="#">헤지펀드</a>
+      <a class="field-tag field-tag--alt" data-cat="alt.VC" href="#">벤처캐피탈</a>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div id="app">
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">대체투자 리서치를 불러오는 중...</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-label" id="modal-label">Research Paper</div>
+        <div class="modal-title" id="modal-title"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta" id="modal-meta"></div>
+      <div class="modal-section-title">Abstract</div>
+      <div class="modal-abstract" id="modal-abstract"></div>
+      <div class="modal-section-title">Key Insights</div>
+      <ul class="insight-points" id="modal-insights"></ul>
+      <div class="modal-actions">
+        <a class="btn" id="modal-arxiv-link" href="#" target="_blank">↗ Read on arXiv</a>
+        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIGURATION ─────────────────────────────────────────────────────────────
+const S2_BASE = 'https://api.semanticscholar.org/graph/v1';
+const S2_FIELDS = 'title,abstract,authors,year,publicationDate,externalIds,fieldsOfStudy,openAccessPdf,publicationTypes';
+
+const SEARCH_QUERIES = [
+  'large language model reasoning',
+  'vision language model multimodal',
+  'diffusion model generative',
+  'reinforcement learning reward',
+  'transformer efficient attention',
+  'AI safety alignment',
+  // AI × 금융 교차 영역도 기본 피드에 포함
+  'machine learning quantitative finance portfolio',
+];
+
+const INSIGHTS = [
+  "LLMs are increasingly used as reasoning engines, not just text generators — enabling multi-step problem solving in complex domains.",
+  "Multimodal architectures that jointly process vision, language, and audio are becoming the dominant paradigm for foundation models.",
+  "Efficiency research (quantization, pruning, distillation) has never been more active — driven by deployment at edge devices.",
+  "Synthetic data generation is emerging as a critical technique to overcome data scarcity in specialized domains.",
+  "Reward modeling and RLHF variants remain the key unsolved frontier for aligning large models with human intent."
+];
+
+// ── 대체투자 카테고리별 메타데이터 ───────────────────────────────────────────
+const ALT_META = {
+  'alt.PE': {
+    title: '사모펀드 (Private Equity)',
+    color: '#7d6608',
+    bg: '#fef9e7',
+    icon: '🏦',
+    desc: '바이아웃, 성장 투자, 기업 구조조정 등 비공개 기업에 대한 지분 투자 전략과 성과 분석 연구.',
+    queries: [
+      'private equity buyout leveraged fund performance',
+      'PE secondary market LP portfolio returns',
+      'ESG private equity value creation operational',
+    ],
+    insights: [
+      '글로벌 PE 시장은 금리 상승 기조 속에서도 바이아웃 딜 규모가 유지되고 있으며, 섹터 집중 전략이 알파 창출의 핵심으로 부상.',
+      '운용사의 운영 개선(Operational Value Creation) 역량이 재무 레버리지보다 수익률 차별화의 주요 요인으로 재평가.',
+      '2차 시장(Secondary Market) 거래 급증 — LP들의 포트폴리오 유동화 수요와 맞물려 세컨더리 펀드로의 자금 유입 가속.',
+      'ESG 통합 PE 전략이 중장기 수익률과 양의 상관관계를 보인다는 실증 연구 다수 발표.',
+      'AI 활용 딜소싱 및 포트폴리오 모니터링이 중대형 GP들 사이에서 표준 관행으로 자리잡는 추세.',
+    ],
+    topics: ['바이아웃', '성장투자', '세컨더리', 'PE 수익률', 'Value Creation', 'GP-LP 관계', 'ESG PE', 'Co-investment'],
+    stats: [
+      { num: '$4.7T', desc: '글로벌 PE\nAUM (2024)' },
+      { num: '15.2%', desc: '10년 평균\n순수익률' },
+      { num: '6,200+', desc: '활동 중인\n글로벌 GP' },
+      { num: '3~5년', desc: '평균\n보유 기간' },
+    ],
+  },
+  'alt.RE': {
+    title: '부동산 (Real Estate)',
+    color: '#1e8449',
+    bg: '#eafaf1',
+    icon: '🏢',
+    desc: '오피스, 물류, 주거, 데이터센터 등 섹터별 부동산 투자 전략과 시장 사이클 분석.',
+    queries: [
+      'real estate investment trust REIT returns portfolio',
+      'commercial real estate data center logistics market',
+      'green building sustainable real estate ESG cap rate',
+    ],
+    insights: [
+      '데이터센터·로지스틱스·의료시설 등 뉴이코노미 섹터로의 자본 이동이 전통 오피스 투자 축소를 상쇄.',
+      '금리 정상화 이후 가치평가 재조정 국면 — 코어 자산 캡레이트 압축 해소와 함께 선별적 매수 기회 등장.',
+      '그린빌딩 인증 자산의 프리미엄 임대료와 낮은 공실률이 지속 가능 부동산 투자 테제를 뒷받침.',
+      '아시아 물류 부동산 수요 급증 — 전자상거래 성장과 공급망 재편이 핵심 드라이버.',
+      '주거용 대체 투자(BTR·학생 기숙사·시니어 하우징) 섹터가 기관 투자자들의 새로운 포트폴리오 축으로 부상.',
+    ],
+    topics: ['코어/코어플러스', '오피스', '물류·로지스틱스', '데이터센터', 'REIT', '그린빌딩', '개발사업', '도시재생'],
+    stats: [
+      { num: '$10.5T', desc: '글로벌 RE\nAUM (2024)' },
+      { num: '8.1%', desc: '10년 평균\n총수익률' },
+      { num: '35%', desc: '물류 섹터\n비중 증가율' },
+      { num: 'Net Zero', desc: '2050 탄소\n중립 목표' },
+    ],
+  },
+  'alt.INF': {
+    title: '인프라 (Infrastructure)',
+    color: '#1a5276',
+    bg: '#eaf2fb',
+    icon: '⚡',
+    desc: '에너지 전환, 디지털 인프라, 교통·유틸리티 등 장기 현금흐름 기반의 인프라 자산 투자 분석.',
+    queries: [
+      'infrastructure fund energy transition renewable investment',
+      'digital infrastructure data center fiber tower investment',
+      'PPP public private partnership emerging market infrastructure',
+    ],
+    insights: [
+      '에너지 전환 인프라(재생에너지·배터리 저장·수소) 투자 규모가 전통 인프라를 추월하며 섹터 패러다임 전환.',
+      '디지털 인프라(데이터센터·광케이블·타워) 수요 폭발적 증가 — AI 컴퓨팅 인프라 수요가 핵심 성장 동력.',
+      '인프라 자산의 인플레이션 연동 수익 특성이 고금리·고인플레 환경에서 포트폴리오 방어력 입증.',
+      '공공-민간 파트너십(PPP) 구조가 신흥국 인프라 갭 해소를 위한 주류 조달 방식으로 정착.',
+      '그린수소·해상풍력·CCUS 등 에너지 신기술 인프라에 대한 기관 투자자 선점 경쟁 가열.',
+    ],
+    topics: ['에너지전환', '재생에너지', '디지털인프라', '교통', '유틸리티', 'PPP', '그린수소', '배터리저장'],
+    stats: [
+      { num: '$1.3T', desc: '글로벌 인프라\n연간 투자액' },
+      { num: '7.5%', desc: '인프라펀드\n평균 수익률' },
+      { num: '30년+', desc: '장기\n자산 수명' },
+      { num: '$15T', desc: '2040년까지\n필요 투자액' },
+    ],
+  },
+  'alt.HF': {
+    title: '헤지펀드 (Hedge Fund)',
+    color: '#6c3483',
+    bg: '#f4ecf7',
+    icon: '📊',
+    desc: '롱숏 에쿼티, 매크로, 아비트라지, 퀀트 전략 등 절대수익 추구 헤지펀드 전략 심층 분석.',
+    queries: [
+      'hedge fund strategy alpha factor long short equity',
+      'quantitative systematic trading machine learning finance',
+      'global macro hedge fund geopolitical risk currency',
+    ],
+    insights: [
+      '멀티스트래티지 헤지펀드의 우위 지속 — 변동성 환경에서 포트폴리오 분산 효과와 리스크 조정 수익률 모두 우월.',
+      'ML·AI 기반 시그널 생성이 전통 퀀트 팩터를 보완하며 체계적 전략의 알파 소스를 다각화.',
+      '지정학적 불확실성 확대로 글로벌 매크로 전략 자금 유입 증가 — 달러·금리·원자재 방향성 베팅 활발.',
+      '이벤트 드리븐 전략이 PE-PE 간 합병·분사 증가와 맞물려 아비트라지 기회 풍부한 환경 조성.',
+      'Private Credit과 헤지펀드의 경계 희석 — 크레딧 전략 헤지펀드의 비유동성 프리미엄 수취 확대.',
+    ],
+    topics: ['롱숏 에쿼티', '글로벌 매크로', '퀀트/CTA', '이벤트드리븐', '크레딧', '아비트라지', '멀티스트래티지', 'RV'],
+    stats: [
+      { num: '$4.3T', desc: '글로벌 HF\nAUM (2024)' },
+      { num: '9.2%', desc: '상위 사분위\n연평균 수익률' },
+      { num: '~0.6', desc: '주식 대비\n상관계수' },
+      { num: '1,000+', desc: '운용 중인\n전략 유형' },
+    ],
+  },
+  'alt.VC': {
+    title: '벤처캐피탈 (Venture Capital)',
+    color: '#922b21',
+    bg: '#fdedec',
+    icon: '🚀',
+    desc: '초기 스타트업 투자부터 성장 단계 펀딩까지, AI·바이오·기후테크·딥테크 분야의 VC 트렌드와 포트폴리오 전략 분석.',
+    queries: [
+      'venture capital startup AI investment valuation fund',
+      'early stage investment unicorn exit IPO startup ecosystem',
+      'climate tech deep tech venture fund portfolio performance',
+    ],
+    insights: [
+      'AI 인프라·파운데이션 모델·AI 애플리케이션 레이어 전반에 걸쳐 VC 투자 집중 심화 — 빈티지 효과 관찰 필요.',
+      'Down round와 flat round 비중 증가 속 밸류에이션 재조정 완료 단계에서 선별적 진입 기회 포착 시점.',
+      '기후테크·클린에너지·탄소 제거 기술에 대한 정책 지원과 맞물려 그린텍 VC 펀드 빈티지 성과 개선 전망.',
+      '바이오·헬스테크에서 AI 신약 개발 스타트업으로의 VC 자본 이동 급격 — 임상 성공률 개선 데이터 축적 중.',
+      'LP 포트폴리오 과배분 해소와 분배 재개로 2025~2026년 빈티지 VC 펀드 자금 모집 환경 개선 예상.',
+    ],
+    topics: ['AI 스타트업', '시드/시리즈A', '성장투자', '기후테크', '바이오텍', '딥테크', 'LP 관계', '엑싯 전략'],
+    stats: [
+      { num: '$345B', desc: '글로벌 VC\n투자액 (2024)' },
+      { num: '25%+', desc: 'Top VC 펀드\n내부수익률' },
+      { num: '1/10', desc: '유니콘 도달\n스타트업 비율' },
+      { num: '10~12년', desc: '펀드 평균\n운용 기간' },
+    ],
+  },
+};
+
+function isAltCat(cat) {
+  return cat.startsWith('alt.');
+}
+
+// ── CACHE (localStorage, TTL 30분) ────────────────────────────────────────────
+const CACHE_TTL = 30 * 60 * 1000;
+function getCached(key) {
+  try {
+    const raw = localStorage.getItem('s2_' + key);
+    if (!raw) return null;
+    const { ts, data } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem('s2_' + key); return null; }
+    return data;
+  } catch { return null; }
+}
+function setCache(key, data) {
+  try { localStorage.setItem('s2_' + key, JSON.stringify({ ts: Date.now(), data })); } catch {}
+}
+
+// ── SEMANTIC SCHOLAR API (CORS 지원) ──────────────────────────────────────────
+const ALT_QUERIES = [
+  'private equity buyout fund performance',
+  'real estate investment portfolio returns',
+  'infrastructure asset management fund',
+  'hedge fund strategy risk factor alpha',
+  'venture capital startup valuation exit',
+  'alternative investment portfolio diversification',
+];
+
+async function fetchPapers(filterCat = 'all', maxResults = 30) {
+  // 캐시 확인
+  const cacheKey = filterCat;
+  const cached = getCached(cacheKey);
+  if (cached) { console.log(`[S2] 캐시 hit: ${filterCat}`); return cached; }
+
+  // 대체투자 카테고리면 전용 쿼리 사용 (버그 수정: CAT_META → ALT_META)
+  const isAlt = filterCat.startsWith('alt.');
+  const queries = filterCat === 'all'
+    ? SEARCH_QUERIES
+    : isAlt
+      ? (ALT_META[filterCat]?.queries || ALT_QUERIES)
+      : [filterCat.replace('cs.', '')];
+
+  const delay = (ms) => new Promise(r => setTimeout(r, ms));
+
+  const fetchOne = async (q, idx) => {
+    if (idx > 0) await delay(idx * 1200); // S2 rate limit: 1 req/sec
+    const url = `${S2_BASE}/paper/search?query=${encodeURIComponent(q)}&fields=${S2_FIELDS}&limit=20`;
+    try {
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (res.status === 429) {
+        console.warn(`[S2] Rate limit (429) for: "${q}" — 재시도 생략`);
+        return [];
+      }
+      if (!res.ok) {
+        console.warn(`[S2] ${res.status} for query: "${q}"`);
+        return [];
+      }
+      const data = await res.json();
+      console.log(`[S2] "${q}" → ${(data.data || []).length}건`);
+      return data.data || [];
+    } catch (e) {
+      console.warn(`[S2] fetch 실패: ${e.message}`);
+      return [];
+    }
+  };
+
+  const fetches = queries.slice(0, 3).map((q, i) => fetchOne(q, i));
+
+  const results = await Promise.all(fetches);
+
+  // 중복 제거 + 최신순 정렬
+  const seen = new Set();
+  const papers = results
+    .flat()
+    .filter(p => {
+      if (!p.title) return false;
+      if (seen.has(p.paperId)) return false;
+      seen.add(p.paperId);
+      return true;
+    })
+    .sort((a, b) => {
+      const da = a.publicationDate || (a.year ? `${a.year}-01-01` : '1900-01-01');
+      const db = b.publicationDate || (b.year ? `${b.year}-01-01` : '1900-01-01');
+      return db.localeCompare(da);
+    })
+    .slice(0, maxResults);
+
+  const mapped = papers.map(mapS2Paper);
+  setCache(cacheKey, mapped);
+  return mapped;
+}
+
+function mapS2Paper(p, forceCat = null) {
+  const arxivId = p.externalIds?.ArXiv;
+  const id = arxivId || p.paperId || 'unknown';
+
+  // 분야 → arXiv 카테고리 유사 매핑
+  const fieldMap = {
+    'Computer Science': 'cs.AI',
+    'Machine Learning': 'cs.LG',
+    'Computer Vision': 'cs.CV',
+    'Natural Language Processing': 'cs.CL',
+    'Robotics': 'cs.RO',
+    'Artificial Intelligence': 'cs.AI',
+    // 대체투자 분야 매핑
+    'Economics': 'alt.PE',
+    'Finance': 'alt.HF',
+    'Business': 'alt.PE',
+  };
+  const cats = (p.fieldsOfStudy || [])
+    .map(f => fieldMap[f] || f)
+    .filter(Boolean);
+  if (!cats.length) cats.push('cs.AI');
+
+  const authors = (p.authors || []).map(a => a.name).filter(Boolean);
+
+  return {
+    id,
+    title: p.title.replace(/\s+/g, ' '),
+    abstract: (p.abstract || '').replace(/\s+/g, ' '),
+    authors,
+    published: p.publicationDate || `${p.year || 2024}-01-01`,
+    categories: cats,
+    url: arxivId
+      ? `https://arxiv.org/abs/${arxivId}`
+      : `https://www.semanticscholar.org/paper/${p.paperId}`,
+    pdfUrl: p.openAccessPdf?.url
+      || (arxivId ? `https://arxiv.org/pdf/${arxivId}` : null),
+  };
+}
+
+// ── INSIGHTS GENERATOR ────────────────────────────────────────────────────────
+function generateInsights(paper) {
+  const text = (paper.title + ' ' + paper.abstract).toLowerCase();
+  const insights = [];
+
+  if (text.includes('llm') || text.includes('language model') || text.includes('transformer'))
+    insights.push('Leverages large language model architecture for improved generalization and few-shot capability.');
+  if (text.includes('diffusion') || text.includes('generative') || text.includes('generation'))
+    insights.push('Uses generative modeling to synthesize high-quality outputs — pushing the state of the art in creative AI.');
+  if (text.includes('reinforcement') || text.includes('reward') || text.includes('policy'))
+    insights.push('Applies reinforcement learning to optimize sequential decision-making, with implications for robotics and game AI.');
+  if (text.includes('benchmark') || text.includes('evaluation') || text.includes('dataset'))
+    insights.push('Introduces a new benchmark or evaluation methodology — a key contribution for measuring real-world AI progress.');
+  if (text.includes('efficient') || text.includes('faster') || text.includes('compres') || text.includes('prune'))
+    insights.push('Proposes efficiency improvements that reduce computational cost — critical for deployment at scale.');
+  if (text.includes('multimodal') || text.includes('vision') || text.includes('image'))
+    insights.push('Bridges visual and language modalities, part of the broader push toward multimodal foundation models.');
+  if (text.includes('agent') || text.includes('planning') || text.includes('reasoning'))
+    insights.push('Addresses autonomous agents and reasoning — a frontier area with high potential for real-world automation.');
+  if (text.includes('safety') || text.includes('align') || text.includes('harmful') || text.includes('bias'))
+    insights.push('Tackles AI safety and alignment — one of the most critical unsolved challenges in deploying powerful AI systems.');
+  if (text.includes('graph') || text.includes('knowledge'))
+    insights.push('Uses graph-based representations to model structured relationships, enabling richer reasoning over complex domains.');
+  if (text.includes('medical') || text.includes('clinical') || text.includes('health'))
+    insights.push('Applies AI to healthcare — a high-impact domain where research breakthroughs can translate to life-saving applications.');
+
+  if (insights.length < 2) {
+    insights.push('Introduces novel methodology with significant potential for advancing the state of the art.');
+    insights.push('The experimental results demonstrate competitive performance across multiple established benchmarks.');
+  }
+
+  return insights.slice(0, 3);
+}
+
+// ── CATEGORY UTILS ────────────────────────────────────────────────────────────
+const CAT_META = {
+  // ── AI / CS ───────────────────────────────────────────────────────────────
+  'cs.AI':  { label: 'AI',       color: 'cs-ai',   query: 'artificial intelligence reasoning' },
+  'cs.LG':  { label: 'ML',       color: 'cs-lg',   query: 'machine learning deep neural network' },
+  'cs.CV':  { label: 'Vision',   color: 'cs-cv',   query: 'computer vision image recognition' },
+  'cs.CL':  { label: 'NLP',      color: 'cs-cl',   query: 'natural language processing transformer' },
+  'cs.RO':  { label: 'Robotics', color: 'cs-ro',   query: 'robotics manipulation control' },
+  'stat.ML':{ label: 'Stat ML',  color: 'stat-ml', query: 'statistical machine learning' },
+
+  // ── 대체투자 ──────────────────────────────────────────────────────────────
+  'alt.PE':  { label: '사모펀드', color: 'alt-pe',
+    queries: [
+      'private equity buyout fund returns performance',
+      'leveraged buyout firm value creation',
+      'private equity institutional investor portfolio',
+    ] },
+  'alt.RE':  { label: '부동산',   color: 'alt-re',
+    queries: [
+      'real estate investment trust REIT performance',
+      'commercial real estate price market',
+      'housing market real estate valuation',
+    ] },
+  'alt.INF': { label: '인프라',   color: 'alt-inf',
+    queries: [
+      'infrastructure investment financing returns',
+      'renewable energy project finance',
+      'public private partnership transport energy',
+    ] },
+  'alt.HF':  { label: '헤지펀드', color: 'alt-hf',
+    queries: [
+      'hedge fund performance risk-adjusted return',
+      'systematic quantitative trading strategy',
+      'long short equity market neutral fund',
+    ] },
+  'alt.VC':  { label: '벤처',     color: 'alt-vc',
+    queries: [
+      'venture capital startup financing IPO',
+      'early stage equity investment entrepreneur',
+      'venture capital fund returns portfolio company',
+    ] },
+};
+
+function renderCats(cats) {
+  return cats.slice(0, 3).map(c => {
+    const m = CAT_META[c] || { label: c.split('.').pop(), color: '' };
+    return `<span class="paper-cat ${m.color}">${m.label}</span>`;
+  }).join('');
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatAuthors(authors) {
+  if (!authors.length) return 'Unknown';
+  if (authors.length === 1) return authors[0];
+  if (authors.length === 2) return authors.join(' & ');
+  return `${authors[0]} et al.`;
+}
+
+function truncate(text, len = 200) {
+  if (text.length <= len) return text;
+  return text.slice(0, len).replace(/\s\S*$/, '') + '…';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+let allPapers = [];
+let currentCat = 'all';
+
+function render(papers, cat = 'all') {
+  currentCat = cat;
+
+  // 대체투자 카테고리면 전용 렌더링
+  if (isAltCat(cat)) {
+    renderAlt(papers, cat);
+    return;
+  }
+
+  if (!papers.length) {
+    document.getElementById('app').innerHTML = `
+      <div class="container">
+        <div class="error-state">
+          <h3>No papers found</h3>
+          <p>Try a different category or check back later.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const featured = papers[0];
+  const grid = papers.slice(1, 10);
+  const trending = papers.slice(10, 20);
+
+  // Update issue info
+  const now = new Date();
+  document.getElementById('issue-info').textContent =
+    `Vol. ${now.getFullYear()} · Issue ${Math.ceil((now - new Date(now.getFullYear(), 0, 1)) / 604800000)} · ${papers.length} Papers`;
+
+  // Count categories
+  const catCounts = {};
+  papers.forEach(p => p.categories.forEach(c => { catCounts[c] = (catCounts[c] || 0) + 1; }));
+
+  document.getElementById('app').innerHTML = `
+
+    <!-- HERO -->
+    <div class="container">
+      <section class="hero">
+        <div class="hero-main">
+          <div>
+            <div class="hero-label">★ Featured Paper</div>
+            <h1 class="hero-title">${featured.title}</h1>
+            <p class="hero-abstract">${truncate(featured.abstract, 320)}</p>
+          </div>
+          <div class="hero-meta">
+            <span class="hero-authors">${formatAuthors(featured.authors)}</span>
+            <span class="hero-date">${formatDate(featured.published)}</span>
+            <a class="hero-link" href="${featured.url}" target="_blank">Read Paper ↗</a>
+          </div>
+        </div>
+        <div class="hero-sidebar">
+          ${INSIGHTS.slice(0, 3).map((txt, i) => `
+            <div class="sidebar-insight">
+              <div class="insight-label">Weekly Insight #${i + 1}</div>
+              <p class="insight-text">"${txt}"</p>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="insights-strip">
+      <div class="container">
+        <div class="insights-grid">
+          <div class="insight-card">
+            <div class="insight-num">${papers.length}</div>
+            <div class="insight-desc">Papers Published<br>This Week</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-num">${Object.keys(catCounts).length}</div>
+            <div class="insight-desc">Research<br>Categories</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-num">${[...new Set(papers.flatMap(p => p.authors))].length}</div>
+            <div class="insight-desc">Unique<br>Authors</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-num">arXiv</div>
+            <div class="insight-desc">Live Data<br>Source</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAPER GRID -->
+    <div class="container">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Latest Papers</h2>
+          <span class="section-count">${grid.length} articles</span>
+        </div>
+        <div class="paper-grid" id="paper-grid">
+          ${grid.map((p, i) => `
+            <div class="paper-card" onclick="openModal(${papers.indexOf(p)})">
+              <div class="paper-number">${String(i + 1).padStart(2, '0')} · ${p.id.split('v')[0]}</div>
+              <div class="paper-categories">${renderCats(p.categories)}</div>
+              <h3 class="paper-title">${p.title}</h3>
+              <p class="paper-abstract">${p.abstract}</p>
+              <div class="paper-footer">
+                <span class="paper-authors">${formatAuthors(p.authors)}</span>
+                <span class="paper-date">${formatDate(p.published)}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    </div>
+
+    <!-- TRENDING + SIDEBAR -->
+    <div class="container">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">More from This Week</h2>
+          <span class="section-count">${trending.length} articles</span>
+        </div>
+        <div class="trends-layout">
+          <div class="trend-list">
+            ${trending.map((p, i) => `
+              <div class="trend-item" onclick="openModal(${papers.indexOf(p)})">
+                <div class="trend-rank">${String(i + 1).padStart(2, '0')}</div>
+                <div class="trend-content">
+                  <h3 class="trend-title">${p.title}</h3>
+                  <p class="trend-excerpt">${p.abstract}</p>
+                  <div class="trend-meta">
+                    ${renderCats(p.categories)}
+                    <a class="trend-arxiv-id" href="${p.url}" target="_blank" onclick="event.stopPropagation()">${p.id.split('v')[0]}</a>
+                    <span style="font-size:12px;color:var(--ink-light)">${formatDate(p.published)}</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <aside>
+            <div class="widget">
+              <div class="widget-title">Topics This Week</div>
+              <ul class="topic-list">
+                ${Object.entries(catCounts)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 10)
+                  .map(([cat, count]) => {
+                    const meta = CAT_META[cat] || { label: cat };
+                    return `
+                      <li class="topic-item" onclick="filterByCat('${cat}')">
+                        <span class="topic-name">${meta.label || cat}</span>
+                        <span class="topic-count">${count}</span>
+                      </li>`;
+                  }).join('')}
+              </ul>
+            </div>
+
+            <div class="pullquote">
+              <p class="pullquote-text">"The rate of AI research publication has never been higher. Every week brings breakthroughs that reshape what we thought was possible."</p>
+            </div>
+
+            <div class="widget">
+              <div class="widget-title">This Week's Themes</div>
+              <ul class="topic-list">
+                ${INSIGHTS.slice(0, 4).map((ins, i) => `
+                  <li class="topic-item" style="display:block;padding:0.7rem 0;">
+                    <span style="font-size:13px;line-height:1.55;color:var(--ink-muted)">${truncate(ins, 80)}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <div class="footer-name">대체투자 <span>인사이트</span></div>
+          <p class="footer-note">
+            학술 논문 데이터를 기반으로 한 대체투자 리서치 매거진입니다.
+            사모펀드 · 부동산 · 인프라 · 헤지펀드 · 벤처캐피탈 전 섹터를 커버합니다.
+          </p>
+          <div class="footer-links">
+            <a class="footer-link" href="#" onclick="filterByCat('alt.PE');return false">사모펀드</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.RE');return false">부동산</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.INF');return false">인프라</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.HF');return false">헤지펀드</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.VC');return false">벤처캐피탈</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  `;
+}
+
+// ── 대체투자 전용 렌더링 ──────────────────────────────────────────────────────
+function renderAlt(papers, cat) {
+  const meta = ALT_META[cat];
+  if (!meta) return;
+
+  const now = new Date();
+  document.getElementById('issue-info').textContent =
+    `대체투자 리서치 · ${now.getFullYear()}년 ${now.getMonth() + 1}월호 · ${meta.title}`;
+
+  const paperCards = papers.length
+    ? papers.slice(0, 12).map((p, i) => `
+        <div class="paper-card" onclick="openModal(${i})" style="cursor:pointer">
+          <div class="paper-number">${String(i + 1).padStart(2, '0')}</div>
+          <div class="paper-categories">
+            <span class="paper-cat" style="background:${meta.bg};color:${meta.color}">${meta.icon} ${meta.title.split(' ')[0]}</span>
+          </div>
+          <h3 class="paper-title">${p.title}</h3>
+          <p class="paper-abstract">${p.abstract || '초록 미제공 논문입니다. 제목을 클릭하면 상세 정보를 확인할 수 있습니다.'}</p>
+          <div class="paper-footer">
+            <span class="paper-authors">${formatAuthors(p.authors)}</span>
+            <span class="paper-date">${formatDate(p.published)}</span>
+          </div>
+        </div>`).join('')
+    : `<div class="error-state" style="grid-column:1/-1" style="padding:3rem;text-align:center">
+        <div style="font-size:2rem;margin-bottom:1rem">📡</div>
+        <h3 style="font-family:var(--serif);margin-bottom:.5rem">API 응답 대기 중</h3>
+        <p style="color:var(--ink-muted);margin-bottom:1.5rem">Semantic Scholar API가 응답하지 않거나 해당 분야 논문이 없습니다.</p>
+        <button class="btn" onclick="filterByCat('${cat}')">↺ 다시 불러오기</button>
+       </div>`;
+
+  document.getElementById('app').innerHTML = `
+
+    <!-- ALT HERO ─────────────────────────────── -->
+    <div style="background:${meta.color};color:#fff;padding:3rem 0;margin-bottom:0">
+      <div class="container">
+        <div style="display:flex;align-items:flex-start;gap:2.5rem;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;opacity:.7;margin-bottom:.8rem">
+              대체투자 리서치 — ${now.getFullYear()}년 ${now.getMonth() + 1}월호
+            </div>
+            <h1 style="font-family:var(--serif);font-size:clamp(2rem,4vw,3.2rem);font-weight:900;line-height:1.1;margin-bottom:1rem">
+              ${meta.icon} ${meta.title}
+            </h1>
+            <p style="font-size:16px;line-height:1.75;opacity:.85;max-width:55ch">${meta.desc}</p>
+          </div>
+          <!-- 주요 지표 -->
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,.15);align-self:stretch;min-width:320px">
+            ${meta.stats.map(s => `
+              <div style="background:rgba(0,0,0,.25);padding:1.5rem;text-align:center">
+                <div style="font-family:var(--mono);font-size:1.8rem;font-weight:700;line-height:1">${s.num}</div>
+                <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65;margin-top:.4rem;white-space:pre-line">${s.desc}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS STRIP ──────────────────────── -->
+    <div style="background:var(--ink);padding:2.5rem 0">
+      <div class="container">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${meta.color};margin-bottom:1.5rem">
+          ${meta.icon} 핵심 인사이트 — ${meta.title}
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem">
+          ${meta.insights.map((txt, i) => `
+            <div style="border-left:3px solid ${meta.color};padding:.8rem 1.2rem">
+              <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${meta.color};margin-bottom:.5rem">
+                인사이트 ${i + 1}
+              </div>
+              <p style="font-family:var(--serif);font-size:14px;font-style:italic;line-height:1.6;color:rgba(255,255,255,.85)">"${txt}"</p>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPICS + PAPERS ─────────────────────── -->
+    <div class="container">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">주요 연구 토픽</h2>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.5rem">
+          ${meta.topics.map(t => `
+            <span style="
+              font-size:12px;font-weight:600;padding:.4rem 1rem;
+              background:${meta.bg};color:${meta.color};
+              border:1px solid ${meta.color}33;letter-spacing:.04em
+            ">${t}</span>`).join('')}
+        </div>
+
+        <div class="section-header">
+          <h2 class="section-title">관련 최신 논문</h2>
+          <span class="section-count">${papers.length}편</span>
+        </div>
+        <div class="paper-grid">${paperCards}</div>
+      </section>
+    </div>
+
+    <!-- ALL ALT CATEGORIES STRIP ────────────── -->
+    <div style="background:var(--paper-warm);padding:2.5rem 0;border-top:2px solid var(--ink)">
+      <div class="container">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-light);margin-bottom:1.5rem">
+          대체투자 전 섹터
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--rule)">
+          ${Object.entries(ALT_META).map(([k, m]) => `
+            <div onclick="filterByCat('${k}')"
+                 style="
+                   background:${k === cat ? m.color : 'var(--paper)'};
+                   color:${k === cat ? '#fff' : 'var(--ink)'};
+                   padding:1.4rem;cursor:pointer;transition:background .15s
+                 "
+                 onmouseover="if('${k}'!=='${cat}')this.style.background='${m.bg}'"
+                 onmouseout="if('${k}'!=='${cat}')this.style.background='var(--paper)'"
+            >
+              <div style="font-size:1.5rem;margin-bottom:.4rem">${m.icon}</div>
+              <div style="font-size:13px;font-weight:700">${m.title.split(' ')[0]}</div>
+              <div style="font-size:11px;opacity:.6;margin-top:.2rem">${m.title.split(' ').slice(1).join(' ')}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <div class="footer-name">대체투자 <span>인사이트</span></div>
+          <p class="footer-note">학술 논문 데이터를 기반으로 한 대체투자 리서치 매거진입니다. 투자 결정의 최종 책임은 투자자에게 있습니다.</p>
+          <div class="footer-links">
+            <a class="footer-link" href="#" onclick="filterByCat('alt.PE');return false">사모펀드</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.RE');return false">부동산</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.INF');return false">인프라</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.HF');return false">헤지펀드</a>
+            <a class="footer-link" href="#" onclick="filterByCat('alt.VC');return false">벤처캐피탈</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  `;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(idx) {
+  const paper = allPapers[idx];
+  if (!paper) return;
+
+  document.getElementById('modal-label').textContent = paper.categories[0] || 'Research Paper';
+  document.getElementById('modal-title').textContent = paper.title;
+  document.getElementById('modal-abstract').textContent = paper.abstract;
+  document.getElementById('modal-arxiv-link').href = paper.url;
+
+  const insights = generateInsights(paper);
+  document.getElementById('modal-insights').innerHTML = insights
+    .map(i => `<li class="insight-point">${i}</li>`).join('');
+
+  document.getElementById('modal-meta').innerHTML = `
+    <div class="modal-meta-item">
+      <span class="modal-meta-label">Authors</span>
+      <span class="modal-meta-value">${formatAuthors(paper.authors)}</span>
+    </div>
+    <div class="modal-meta-item">
+      <span class="modal-meta-label">Published</span>
+      <span class="modal-meta-value">${formatDate(paper.published)}</span>
+    </div>
+    <div class="modal-meta-item">
+      <span class="modal-meta-label">arXiv ID</span>
+      <span class="modal-meta-value" style="font-family:var(--mono)">${paper.id.split('v')[0]}</span>
+    </div>
+    <div class="modal-meta-item">
+      <span class="modal-meta-label">Categories</span>
+      <span class="modal-meta-value">${paper.categories.slice(0, 4).join(', ')}</span>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+async function filterByCat(cat) {
+  // nav active state 동기화
+  document.querySelectorAll('.field-tag').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === cat);
+  });
+
+  const labelMap = { 'all': '전체', ...Object.fromEntries(Object.entries(ALT_META).map(([k,v])=>[k,v.title.split(' ')[0]])) };
+  const label = CAT_META[cat]?.label || labelMap[cat] || cat;
+
+  document.getElementById('app').innerHTML = `
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">${label} 논문 검색 중... (최대 5초 소요)</div>
+    </div>`;
+  try {
+    const papers = await fetchPapers(cat, 30);
+    allPapers = papers;
+    render(papers, cat);
+  } catch (err) {
+    document.getElementById('app').innerHTML = `
+      <div class="container"><div class="error-state">
+        <h3>Fetch failed</h3><p>${err.message}</p>
+        <button class="btn" style="margin-top:1.5rem" onclick="location.reload()">↺ Retry</button>
+      </div></div>`;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.addEventListener('click', e => {
+  const tag = e.target.closest('.field-tag');
+  if (!tag) return;
+  e.preventDefault();
+  document.querySelectorAll('.field-tag').forEach(t => t.classList.remove('active'));
+  tag.classList.add('active');
+  filterByCat(tag.dataset.cat);
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const papers = await fetchPapers('alt.PE', 30);
+    if (!papers.length) throw new Error('No papers returned from Semantic Scholar API.');
+    allPapers = papers;
+    render(papers, 'alt.PE');
+  } catch (err) {
+    console.error(err);
+    document.getElementById('app').innerHTML = `
+      <div class="container">
+        <div class="error-state">
+          <h3>Unable to load papers</h3>
+          <p style="margin-top:0.5rem">
+            The Semantic Scholar API may be temporarily unavailable.<br>
+            Please check your network connection and try refreshing.
+          </p>
+          <p style="margin-top:1rem;font-family:var(--mono);font-size:12px;color:var(--ink-light)">${err.message}</p>
+          <button class="btn" style="margin-top:1.5rem" onclick="location.reload()">↺ Retry</button>
+        </div>
+      </div>`;
+  }
+})();
+</script>
+</body>
+</html>
