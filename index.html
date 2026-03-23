@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대체투자 인사이트 — Alternative Investment Research Magazine</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -163,7 +165,7 @@
     .magazine-tagline { font-size: 11px; letter-spacing: 0.04em; color: var(--ink-2); margin-top: 0.3rem; }
 
     .masthead-nav { border-top: 1px solid var(--border); }
-    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; }
+    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; align-items: center; }
     .field-tags::-webkit-scrollbar { display: none; }
     .field-tag {
       font-size: 11px; font-weight: 500; color: var(--ink-2);
@@ -291,7 +293,10 @@
     .paper-cat    { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 4px; background: var(--accent-lt); color: var(--accent); display: inline-block; width: fit-content; }
     .paper-categories { display: flex; flex-wrap: wrap; gap: 0.3rem; }
     .paper-title  { font-size: 13.5px; font-weight: 700; line-height: 1.45; letter-spacing: -0.01em; color: var(--ink); flex: 1; }
-    .paper-abstract { font-size: 12px; line-height: 1.65; color: var(--ink-2); }
+    .paper-abstract { font-size: 12px; line-height: 1.65; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .paper-abstract.expanded { display: block; overflow: visible; -webkit-line-clamp: unset; }
+    .abstract-toggle { font-size: 10.5px; color: var(--accent); cursor: pointer; background: none; border: none; padding: 0; letter-spacing: 0.02em; opacity: 0.85; }
+    .abstract-toggle:hover { opacity: 1; text-decoration: underline; }
     .paper-authors { font-size: 10.5px; color: var(--ink-3); }
     .paper-date   { font-size: 10px; color: var(--ink-3); }
     .paper-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid var(--border); }
@@ -305,7 +310,8 @@
     /* ── SECTIONS ── */
     .section { padding: 2rem 0; }
     .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.5rem; }
-    .section-title  { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); flex: 1; }
+    .section-title  { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); flex: 1; display: flex; align-items: center; gap: 0.6rem; }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: var(--border-2); }
     .section-count  { font-size: 10px; font-family: var(--mono); color: var(--ink-3); }
     .stat-ml { font-family: var(--mono); font-size: 9px; color: var(--ink-3); }
     .pullquote { border-left: 3px solid var(--accent); padding: 0.8rem 1.2rem; margin: 1.5rem 0; background: var(--accent-lt); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
@@ -413,11 +419,12 @@
 <header class="masthead">
   <div class="masthead-top container">
     <div class="issue-info" id="issue-info">Loading...</div>
-    <div class="page-nav">
+    <nav class="page-nav">
       <a class="current" href="index.html">리서치 논문</a>
       <a href="news.html">뉴스 피드</a>
+      <a href="social.html">SNS 인사이트</a>
       <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="테마 변경">☀</button>
-    </div>
+    </nav>
   </div>
   <div class="masthead-title">
     <div class="magazine-name">대체투자 <span>인사이트</span></div>
@@ -1000,7 +1007,8 @@ function render(papers, cat = 'all') {
               <div class="paper-number">${String(i + 1).padStart(2, '0')} · ${p.id.split('v')[0]}</div>
               <div class="paper-categories">${renderCats(p.categories)}</div>
               <h3 class="paper-title">${p.title}</h3>
-              <p class="paper-abstract">${p.abstract}</p>
+              <p class="paper-abstract" id="abs-main-${papers.indexOf(p)}">${p.abstract}</p>
+              <button class="abstract-toggle" onclick="toggleAbstract(this,event,'abs-main-${papers.indexOf(p)}')">더보기 →</button>
               <div class="paper-footer">
                 <span class="paper-authors">${formatAuthors(p.authors)}</span>
                 <span class="paper-date">${formatDate(p.published)}</span>
@@ -1088,6 +1096,8 @@ function render(papers, cat = 'all') {
             <a class="footer-link" href="#" onclick="filterByCat('alt.INF');return false">인프라</a>
             <a class="footer-link" href="#" onclick="filterByCat('alt.HF');return false">헤지펀드</a>
             <a class="footer-link" href="#" onclick="filterByCat('alt.VC');return false">벤처캐피탈</a>
+            <a class="footer-link" href="news.html">뉴스 피드</a>
+            <a class="footer-link" href="social.html">SNS 인사이트</a>
           </div>
         </div>
       </div>
@@ -1112,7 +1122,8 @@ function renderAlt(papers, cat) {
             <span class="paper-cat" style="background:${meta.bg};color:${meta.color}">${meta.icon} ${meta.title.split(' ')[0]}</span>
           </div>
           <h3 class="paper-title">${p.title}</h3>
-          <p class="paper-abstract">${p.abstract || '초록 미제공 논문입니다. 제목을 클릭하면 상세 정보를 확인할 수 있습니다.'}</p>
+          <p class="paper-abstract" id="abs-alt-${i}">${p.abstract || '초록 미제공 논문입니다. 제목을 클릭하면 상세 정보를 확인할 수 있습니다.'}</p>
+          <button class="abstract-toggle" onclick="toggleAbstract(this,event,'abs-alt-${i}')">더보기 →</button>
           <div class="paper-footer">
             <span class="paper-authors">${formatAuthors(p.authors)}</span>
             <span class="paper-date">${formatDate(p.published)}</span>
@@ -1129,7 +1140,7 @@ function renderAlt(papers, cat) {
 
     <!-- ALT HERO ─────────────────────────────── -->
     <div class="container" style="padding-top:2rem;padding-bottom:0">
-      <div style="background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border-2);border-radius:16px;padding:2.5rem;display:flex;align-items:flex-start;gap:2.5rem;flex-wrap:wrap;margin-bottom:1px">
+      <div style="background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border-2);border-radius:16px;padding:2.5rem;display:flex;align-items:flex-start;gap:2.5rem;flex-wrap:wrap;margin-bottom:0.75rem">
         <div style="flex:1;min-width:280px">
           <div style="font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.9rem">
             대체투자 리서치 — ${now.getFullYear()}년 ${now.getMonth() + 1}월호
@@ -1229,11 +1240,22 @@ function renderAlt(papers, cat) {
             <a class="footer-link" href="#" onclick="filterByCat('alt.INF');return false">인프라</a>
             <a class="footer-link" href="#" onclick="filterByCat('alt.HF');return false">헤지펀드</a>
             <a class="footer-link" href="#" onclick="filterByCat('alt.VC');return false">벤처캐피탈</a>
+            <a class="footer-link" href="news.html">뉴스 피드</a>
+            <a class="footer-link" href="social.html">SNS 인사이트</a>
           </div>
         </div>
       </div>
     </footer>
   `;
+}
+
+// ── ABSTRACT TOGGLE ───────────────────────────────────────────────────────────
+function toggleAbstract(btn, event, id) {
+  event.stopPropagation();
+  const p = document.getElementById(id);
+  if (!p) return;
+  const expanded = p.classList.toggle('expanded');
+  btn.textContent = expanded ? '접기 ↑' : '더보기 →';
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
@@ -1333,7 +1355,7 @@ function renderFallback(cat) {
 
   document.getElementById('app').innerHTML = `
     <div class="container" style="padding-top:2rem;padding-bottom:0">
-      <div style="background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border-2);border-radius:16px;padding:2.5rem;display:flex;align-items:flex-start;gap:2.5rem;flex-wrap:wrap;margin-bottom:1px">
+      <div style="background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border-2);border-radius:16px;padding:2.5rem;display:flex;align-items:flex-start;gap:2.5rem;flex-wrap:wrap;margin-bottom:0.75rem">
         <div style="flex:1;min-width:260px">
           <div style="font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.9rem">대체투자 리서치</div>
           <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.18;letter-spacing:-0.02em;margin-bottom:.9rem;color:var(--ink)">${meta.icon} ${meta.title}</h2>

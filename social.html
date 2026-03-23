@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대체투자 SNS 인사이트 — Alternative Investment Social Feed</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #09090f;
+      --bg-2:      #111118;
+      --bg-3:      #18181f;
+      --ink:       #e2e2f0;
+      --ink-2:     #6b6b90;
+      --ink-3:     #3a3a55;
+      --border:    rgba(255,255,255,0.06);
+      --border-2:  rgba(255,255,255,0.11);
+      --accent:    #a78bfa;
+      --accent-2:  #60a5fa;
+      --accent-dk: #7c3aed;
+      --accent-lt: rgba(167,139,250,0.10);
+      --gradient:  linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+      --r: 12px; --r-sm: 8px; --r-lg: 16px;
+
+      --paper-warm: #111118; --paper: #18181f; --paper-dark: #0d0d14;
+      --navy: #1a1a28; --navy-lt: rgba(167,139,250,0.08);
+      --rule: rgba(255,255,255,0.07); --rule-dark: rgba(255,255,255,0.12);
+      --ink-muted: #6b6b90; --ink-light: #4a4a68;
+      --gold: #a78bfa; --teal: #60a5fa;
+      --glow-blue: 0 0 20px rgba(167,139,250,0.15);
+      --glow-sm: 0 2px 12px rgba(167,139,250,0.10);
+      --radius: 12px; --radius-sm: 8px;
+      --sans:  "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+      --serif: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+      --mono:  "JetBrains Mono", "Noto Sans Mono", monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f8f8ff; --bg-2: #f0f0fa; --bg-3: #e8e8f5;
+      --ink: #0f0f1a; --ink-2: #5a5a78; --ink-3: #a0a0c0;
+      --border: rgba(0,0,0,0.07); --border-2: rgba(0,0,0,0.12);
+      --accent: #7c3aed; --accent-2: #2563eb; --accent-dk: #5b21b6;
+      --accent-lt: rgba(124,58,237,0.08);
+      --paper-warm: #f0f0fa; --paper: #e8e8f5; --paper-dark: #e0e0f0;
+      --rule: rgba(0,0,0,0.07); --rule-dark: rgba(0,0,0,0.13);
+      --ink-muted: #5a5a78; --ink-light: #7070a0;
+      --navy: #ebebff; --navy-lt: rgba(124,58,237,0.06);
+    }
+    [data-theme="light"] .masthead { background: rgba(248,248,255,0.92); }
+    [data-theme="light"] .blob { opacity: 0.08; }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; font-size: 14px; min-height: 100dvh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; transition: background-color 0.25s, color 0.25s; }
+    a { color: inherit; }
+
+    /* ── BLOBS ── */
+    .blob { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.20; animation: blob 8s infinite ease-in-out; pointer-events: none; z-index: -1; }
+    .blob-1 { width: 600px; height: 600px; background: var(--accent);   top: -180px; left: -80px;  animation-delay: 0s; }
+    .blob-2 { width: 500px; height: 500px; background: var(--accent-2); bottom: -130px; right: -80px; animation-delay: 3s; }
+    @keyframes blob { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-50px) scale(1.08)} 66%{transform:translate(-20px,20px) scale(0.94)} }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── MASTHEAD ── */
+    .masthead { background: rgba(9,9,15,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-2); transition: background 0.25s; }
+    .masthead::before { content: ""; display: block; height: 2px; background: var(--gradient); opacity: 0.65; }
+    .masthead-top { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 2.5rem; border-bottom: 1px solid var(--border); }
+    .issue-info { font-size: 11px; letter-spacing: 0.03em; color: var(--ink-2); }
+    .page-nav { display: flex; gap: 0.3rem; align-items: center; }
+    .page-nav a { font-size: 11px; font-weight: 500; text-decoration: none; padding: 0.3rem 0.8rem; border-radius: var(--r-sm); border: 1px solid transparent; color: var(--ink-2); transition: all 0.15s; }
+    .page-nav a:hover { color: var(--ink); background: var(--border); }
+    .page-nav a.current { background: var(--accent-lt); color: var(--accent); border-color: rgba(167,139,250,0.25); font-weight: 600; }
+    .page-nav a:active { transform: translateY(1px); }
+    .theme-btn { background: none; border: 1px solid var(--border-2); color: var(--ink-2); font-size: 14px; padding: 0.25rem 0.6rem; border-radius: var(--r-sm); cursor: pointer; transition: all 0.15s; line-height: 1; }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+    .theme-btn:active { transform: translateY(1px); }
+    .masthead-title { text-align: center; padding: 1rem 2rem 0.85rem; }
+    .magazine-name { font-size: clamp(1.1rem, 2.4vw, 1.7rem); font-weight: 800; letter-spacing: -0.01em; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .magazine-name span { -webkit-text-fill-color: transparent; }
+    .magazine-tagline { font-size: 11px; letter-spacing: 0.04em; color: var(--ink-2); margin-top: 0.3rem; }
+    .masthead-nav { border-top: 1px solid var(--border); }
+    .field-tags { display: flex; overflow-x: auto; scrollbar-width: none; align-items: center; }
+    .field-tags::-webkit-scrollbar { display: none; }
+    .field-tag { font-size: 11px; font-weight: 500; color: var(--ink-2); cursor: pointer; text-decoration: none; transition: all 0.15s; padding: 0.7rem 1.2rem; border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
+    .field-tag:hover { color: var(--ink); background: var(--border); }
+    .field-tag.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .field-tag:active { opacity: 0.75; }
+    /* ── FEED TOGGLE (platform + mode) ── */
+    .feed-toggle { display: flex; gap: 0.3rem; margin-left: auto; padding: 0.4rem 1rem; flex-shrink: 0; align-items: center; }
+    .feed-toggle-btn { font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-2); background: transparent; color: var(--ink-2); padding: 0.28rem 0.75rem; border-radius: var(--r-sm); transition: all 0.12s; white-space: nowrap; }
+    .feed-toggle-btn:hover { color: var(--ink); background: var(--border); }
+    .feed-toggle-btn.active { background: var(--accent-lt); color: var(--accent); border-color: rgba(167,139,250,0.25); }
+    .feed-toggle-btn:active { transform: translateY(1px); }
+    .feed-sep { width: 1px; height: 16px; background: var(--border-2); margin: 0 0.25rem; flex-shrink: 0; }
+
+    /* ── TICKER ── */
+    .ticker-wrap { overflow: hidden; border-bottom: 1px solid var(--border); background: rgba(167,139,250,0.04); height: 34px; display: flex; align-items: center; }
+    .ticker-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); padding: 0 1.1rem; white-space: nowrap; border-right: 1px solid var(--border-2); flex-shrink: 0; z-index: 2; }
+    .ticker-body { position: relative; flex: 1; overflow: hidden; height: 100%; display: flex; align-items: center; }
+    .ticker-body::before { content: ''; position: absolute; left: 0; top: 0; width: 60px; height: 100%; background: linear-gradient(to right, var(--bg-2, #111118) 30%, transparent); z-index: 1; pointer-events: none; }
+    .ticker-body::after  { content: ''; position: absolute; right: 0; top: 0; width: 60px; height: 100%; background: linear-gradient(to left, var(--bg-2, #111118) 30%, transparent); z-index: 1; pointer-events: none; }
+    .ticker-track { display: flex; animation: ticker 80s linear infinite; white-space: nowrap; }
+    .ticker-item  { font-size: 11px; color: var(--ink-2); padding: 0 2rem; }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+
+    /* ── SOCIAL CARDS ── */
+    .social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 1024px) { .social-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px)  { .social-grid { grid-template-columns: 1fr; } .container { padding: 0 1rem; } .masthead-top { padding: 0.5rem 1rem; } }
+
+    .social-card {
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--r); padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.6rem;
+      cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .social-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,0.28); box-shadow: 0 8px 30px rgba(167,139,250,0.10); }
+    .social-card:active { transform: translateY(0); opacity: 0.9; }
+
+    .social-card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .social-handle { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+    .social-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+    .social-avatar.twitter  { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); }
+    .social-avatar.mastodon { background: rgba(99,100,255,0.15); border: 1px solid rgba(99,100,255,0.25); }
+    .social-avatar.reddit   { background: rgba(255,86,0,0.12); border: 1px solid rgba(255,86,0,0.2); }
+    .social-avatar.blog     { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.2); }
+    .social-name { font-size: 11.5px; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .social-uname { font-size: 10px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .plat-badge { display: flex; align-items: center; gap: 0.25rem; font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; padding: 0.18rem 0.5rem; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+    .plat-badge.twitter  { background: rgba(0,0,0,0.5); color: #e2e2f0; border: 1px solid rgba(255,255,255,0.12); }
+    .plat-badge.mastodon { background: rgba(99,100,255,0.15); color: #a5b4fc; border: 1px solid rgba(99,100,255,0.2); }
+    .plat-badge.reddit   { background: rgba(255,86,0,0.10); color: #fb923c; border: 1px solid rgba(255,86,0,0.18); }
+    .plat-badge.blog     { background: rgba(52,211,153,0.10); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.2); }
+
+    .social-content { font-size: 12.5px; line-height: 1.65; color: var(--ink); word-break: break-word; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+    .social-content.expanded { display: block; overflow: visible; -webkit-line-clamp: unset; }
+    .social-more { font-size: 10.5px; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; }
+    .social-more:hover { text-decoration: underline; }
+
+    .social-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.55rem; border-top: 1px solid var(--border); }
+    .social-stats { display: flex; gap: 0.85rem; }
+    .social-stat  { font-size: 10px; color: var(--ink-2); display: flex; align-items: center; gap: 0.25rem; }
+    .social-time  { font-size: 10px; color: var(--ink-3); }
+    .social-link  { font-size: 10px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+    .social-link:hover { text-decoration: underline; }
+
+    /* ── SECTION HEADER ── */
+    .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.5rem; }
+    .section-title  { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); flex: 1; display: flex; align-items: center; gap: 0.6rem; }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: var(--border-2); }
+    .section-meta   { font-size: 10px; font-family: var(--mono); color: var(--ink-3); }
+
+    /* ── HERO BANNER ── */
+    .social-hero { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-2); border-radius: 16px; padding: 2.5rem; margin-bottom: 0.75rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 2.5rem; flex-wrap: wrap; }
+    .hero-label { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; background: linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.7rem; }
+    .hero-title { font-size: clamp(1.5rem,3vw,2.2rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 0.6rem; }
+    .hero-desc { font-size: 13px; line-height: 1.7; color: var(--ink-2); max-width: 46ch; }
+    .hero-platforms { display: flex; flex-direction: column; gap: 0.5rem; align-self: center; min-width: 160px; }
+    .hero-plat-item { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); border-radius: 10px; padding: .5rem 1rem; font-size: 11.5px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; gap: 0.5rem; }
+
+    /* ── SECTORS STRIP ── */
+    .sectors-strip { background: var(--bg-3); border-top: 1px solid var(--border); padding: 2rem 0; margin-top: 2rem; }
+    .sectors-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; }
+    @media (max-width: 768px) { .sectors-grid { grid-template-columns: repeat(3, 1fr); } }
+    .sector-tile { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem 0.75rem; text-align: center; cursor: pointer; transition: all 0.15s; }
+    .sector-tile:hover { border-color: rgba(167,139,250,0.3); background: var(--accent-lt); }
+    .sector-tile.active-tile { border-color: rgba(167,139,250,0.35); background: var(--accent-lt); }
+    .sector-icon { font-size: 1.4rem; margin-bottom: 0.35rem; }
+    .sector-name { font-size: 12px; font-weight: 700; color: var(--ink); }
+    .sector-en { font-size: 9px; color: var(--ink-2); margin-top: 0.15rem; }
+
+    /* ── SKELETON ── */
+    @keyframes shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
+    .sk-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--r); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; min-height: 180px; }
+    .sk-block { border-radius: 6px; background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 50%, var(--bg-2) 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite; }
+    .sk-line  { height: 14px; } .sk-line-sm { height: 10px; } .sk-line-lg { height: 16px; }
+    .sk-w-30 { width: 30%; } .sk-w-40 { width: 40%; } .sk-w-60 { width: 60%; } .sk-w-80 { width: 80%; } .sk-w-100 { width: 100%; }
+    .sk-avatar { width: 28px; height: 28px; border-radius: 50%; }
+
+    /* ── ERROR ── */
+    .error-state { padding: 3rem; text-align: center; grid-column: 1/-1; }
+    .btn { display: inline-block; padding: 0.6rem 1.5rem; border-radius: var(--r-sm); background: var(--accent-lt); color: var(--accent); border: 1px solid rgba(167,139,250,0.3); cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+    .btn:hover { background: rgba(167,139,250,0.2); }
+
+    /* ── NOTICE BANNER ── */
+    .notice-bar { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15); border-radius: var(--r-sm); padding: 0.6rem 1rem; font-size: 11px; color: var(--ink-2); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); padding: 2rem 0; margin-top: 2rem; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-name  { font-size: 11px; font-weight: 600; color: var(--ink-2); }
+    .footer-note  { font-size: 11px; color: var(--ink-3); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-link  { font-size: 11px; color: var(--ink-2); text-decoration: none; transition: color 0.12s; }
+    .footer-link:hover { color: var(--accent); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    /* ── CATEGORY COLORS ── */
+    .alt-pe  { --c: #a78bfa; } .alt-re  { --c: #60a5fa; }
+    .alt-inf { --c: #34d399; } .alt-hf  { --c: #fb923c; } .alt-vc  { --c: #f472b6; }
+    .field-tag--alt.active, .field-tag--alt:hover { color: var(--c, var(--accent)); }
+    .social-card:nth-child(1){animation-delay:.00s} .social-card:nth-child(2){animation-delay:.04s}
+    .social-card:nth-child(3){animation-delay:.08s} .social-card:nth-child(4){animation-delay:.12s}
+    .social-card:nth-child(5){animation-delay:.16s} .social-card:nth-child(6){animation-delay:.20s}
+  </style>
+</head>
+<body>
+
+<!-- BACKGROUND BLOBS -->
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-top container">
+    <div class="issue-info" id="issue-info">SNS 피드 로딩 중...</div>
+    <nav class="page-nav">
+      <a href="index.html">리서치 논문</a>
+      <a href="news.html">뉴스 피드</a>
+      <a class="current" href="social.html">SNS 인사이트</a>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="테마 변경">☀</button>
+    </nav>
+  </div>
+  <div class="masthead-title">
+    <div class="magazine-name">대체투자 <span>SNS 인사이트</span></div>
+    <div class="magazine-tagline">Social signals from X · Mastodon · Reddit — across alternative investments</div>
+  </div>
+  <div class="masthead-nav">
+    <nav class="field-tags container" id="field-tags">
+      <a class="field-tag field-tag--alt active" data-cat="alt.PE"  href="#" onclick="switchCat('alt.PE'); return false">사모펀드</a>
+      <a class="field-tag field-tag--alt"        data-cat="alt.RE"  href="#" onclick="switchCat('alt.RE'); return false">부동산</a>
+      <a class="field-tag field-tag--alt"        data-cat="alt.INF" href="#" onclick="switchCat('alt.INF'); return false">인프라</a>
+      <a class="field-tag field-tag--alt"        data-cat="alt.HF"  href="#" onclick="switchCat('alt.HF'); return false">헤지펀드</a>
+      <a class="field-tag field-tag--alt"        data-cat="alt.VC"  href="#" onclick="switchCat('alt.VC'); return false">벤처캐피탈</a>
+      <div class="feed-toggle">
+        <button class="feed-toggle-btn active" data-plat="all"      onclick="setPlatform('all')">🌐 전체</button>
+        <button class="feed-toggle-btn"        data-plat="twitter"  onclick="setPlatform('twitter')">𝕏 Twitter</button>
+        <button class="feed-toggle-btn"        data-plat="mastodon" onclick="setPlatform('mastodon')">🐘 Mastodon</button>
+        <button class="feed-toggle-btn"        data-plat="reddit"   onclick="setPlatform('reddit')">🤖 Reddit</button>
+        <div class="feed-sep"></div>
+        <button class="feed-toggle-btn active" id="btn-global" onclick="setMode('global')">🌏 글로벌</button>
+        <button class="feed-toggle-btn"        id="btn-ko"     onclick="setMode('ko')">🇰🇷 국내</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">실시간</div>
+  <div class="ticker-body">
+    <div class="ticker-track" id="ticker-track">
+      <div class="ticker-item"><span>●</span>SNS 피드 로딩 중...</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LOADING SKELETON -->
+<div id="skeleton" class="container" style="padding-top:2rem;padding-bottom:1rem">
+  <div class="social-grid">
+    <div class="sk-card">
+      <div style="display:flex;align-items:center;gap:0.5rem"><div class="sk-block sk-avatar"></div><div style="flex:1;display:flex;flex-direction:column;gap:0.3rem"><div class="sk-block sk-line sk-w-40"></div><div class="sk-block sk-line-sm sk-w-30"></div></div></div>
+      <div class="sk-block sk-line sk-w-100"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line-sm sk-w-40"></div>
+    </div>
+    <div class="sk-card">
+      <div style="display:flex;align-items:center;gap:0.5rem"><div class="sk-block sk-avatar"></div><div style="flex:1;display:flex;flex-direction:column;gap:0.3rem"><div class="sk-block sk-line sk-w-40"></div><div class="sk-block sk-line-sm sk-w-30"></div></div></div>
+      <div class="sk-block sk-line sk-w-100"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line-sm sk-w-40"></div>
+    </div>
+    <div class="sk-card">
+      <div style="display:flex;align-items:center;gap:0.5rem"><div class="sk-block sk-avatar"></div><div style="flex:1;display:flex;flex-direction:column;gap:0.3rem"><div class="sk-block sk-line sk-w-40"></div><div class="sk-block sk-line-sm sk-w-30"></div></div></div>
+      <div class="sk-block sk-line sk-w-100"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line-sm sk-w-40"></div>
+    </div>
+    <div class="sk-card">
+      <div style="display:flex;align-items:center;gap:0.5rem"><div class="sk-block sk-avatar"></div><div style="flex:1;display:flex;flex-direction:column;gap:0.3rem"><div class="sk-block sk-line sk-w-40"></div><div class="sk-block sk-line-sm sk-w-30"></div></div></div>
+      <div class="sk-block sk-line sk-w-100"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line-sm sk-w-40"></div>
+    </div>
+    <div class="sk-card">
+      <div style="display:flex;align-items:center;gap:0.5rem"><div class="sk-block sk-avatar"></div><div style="flex:1;display:flex;flex-direction:column;gap:0.3rem"><div class="sk-block sk-line sk-w-40"></div><div class="sk-block sk-line-sm sk-w-30"></div></div></div>
+      <div class="sk-block sk-line sk-w-100"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line-sm sk-w-40"></div>
+    </div>
+    <div class="sk-card">
+      <div style="display:flex;align-items:center;gap:0.5rem"><div class="sk-block sk-avatar"></div><div style="flex:1;display:flex;flex-direction:column;gap:0.3rem"><div class="sk-block sk-line sk-w-40"></div><div class="sk-block sk-line-sm sk-w-30"></div></div></div>
+      <div class="sk-block sk-line sk-w-100"></div><div class="sk-block sk-line sk-w-80"></div><div class="sk-block sk-line sk-w-60"></div><div class="sk-block sk-line-sm sk-w-40"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP CONTENT (filled by JS) -->
+<div id="app"></div>
+
+<script>
+// ── THEME ──────────────────────────────────────────────────────────────────────
+(function(){ document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark'); })();
+function toggleTheme() {
+  var next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  var btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = next === 'light' ? '☾' : '☀';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light' ? '☾' : '☀';
+});
+
+// ── CATEGORY META ──────────────────────────────────────────────────────────────
+const CAT_META = {
+  'alt.PE':  { title: '사모펀드', en: 'Private Equity',   icon: '🏦', desc: '바이아웃 · M&A · 기업구조조정 · 세컨더리 시장 소셜 토론' },
+  'alt.RE':  { title: '부동산',   en: 'Real Estate',       icon: '🏢', desc: '오피스 · 물류 · REIT · 데이터센터 부동산 트렌드 소셜 인사이트' },
+  'alt.INF': { title: '인프라',   en: 'Infrastructure',    icon: '⚡', desc: '에너지전환 · 재생에너지 · 디지털인프라 투자 소셜 동향' },
+  'alt.HF':  { title: '헤지펀드', en: 'Hedge Fund',        icon: '📊', desc: '퀀트 · 매크로 · 이벤트드리븐 전략 소셜 토론' },
+  'alt.VC':  { title: '벤처캐피탈', en: 'Venture Capital', icon: '🚀', desc: 'AI · 바이오 · 기후테크 스타트업 펀딩 소셜 인사이트' },
+};
+
+// ── SEARCH QUERIES PER CATEGORY ────────────────────────────────────────────────
+const QUERIES = {
+  'alt.PE':  { en: 'private equity buyout LBO', ko: '사모펀드 바이아웃 PEF',  tag: 'privateequity', reddit: 'privateequity+investing+finance' },
+  'alt.RE':  { en: 'real estate REIT investment', ko: '부동산투자 리츠 상업용',  tag: 'realestate',    reddit: 'realestateinvesting+RealEstate' },
+  'alt.INF': { en: 'infrastructure fund renewable energy', ko: '인프라투자 재생에너지', tag: 'infrastructure', reddit: 'investing+RenewableEnergy+energy' },
+  'alt.HF':  { en: 'hedge fund quant alpha systematic', ko: '헤지펀드 퀀트 알파', tag: 'hedgefund',     reddit: 'algotrading+quant+wallstreetbets' },
+  'alt.VC':  { en: 'venture capital startup funding AI', ko: '벤처캐피탈 스타트업 투자', tag: 'venturecapital', reddit: 'startups+venturecapital+Entrepreneur' },
+};
+
+// ── NITTER INSTANCES (multiple for fallback) ───────────────────────────────────
+const NITTER_INSTANCES = [
+  'https://nitter.privacydev.net',
+  'https://nitter.cz',
+  'https://nitter.net',
+];
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let currentCat  = 'alt.PE';
+let currentPlat = 'all';
+let currentMode = 'global';
+let allPosts    = [];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function stripHtml(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return d.textContent.replace(/\s+/g, ' ').trim();
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return '';
+  const diff = Date.now() - d.getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60) return `${m}분 전`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}시간 전`;
+  return `${Math.floor(h / 24)}일 전`;
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── FETCH: TWITTER via Nitter RSS ─────────────────────────────────────────────
+async function fetchTwitter(query) {
+  for (const instance of NITTER_INSTANCES) {
+    const feedUrl = `${instance}/search/rss?q=${encodeURIComponent(query)}&f=tweets`;
+    try {
+      const res = await fetch(RSS2JSON + encodeURIComponent(feedUrl), { signal: AbortSignal.timeout(7000) });
+      if (!res.ok) continue;
+      const json = await res.json();
+      if (json.status !== 'ok' || !json.items?.length) continue;
+      return json.items.map(item => {
+        const rawTitle = (item.title || '').trim();
+        // Nitter format: "Name: tweet text" or "@handle: text"
+        const colonIdx = rawTitle.indexOf(':');
+        const name    = colonIdx > 0 ? rawTitle.slice(0, colonIdx).trim() : 'X User';
+        const content = colonIdx > 0 ? rawTitle.slice(colonIdx + 1).trim() : rawTitle;
+        const handle  = item.link?.match(/\/([^/]+)\/status/)?.[1] || '';
+        return {
+          platform:    'twitter',
+          displayName: name,
+          handle:      handle ? `@${handle}` : name,
+          content:     content || stripHtml(item.description || '').slice(0, 500),
+          link:        item.link?.replace(instance, 'https://x.com') || '#',
+          pubDate:     item.pubDate || '',
+          likes: 0, retweets: 0, replies: 0,
+        };
+      }).filter(p => p.content && p.content.length > 20);
+    } catch(e) {
+      console.warn('[Nitter] failed:', instance, e.message);
+    }
+  }
+  return [];
+}
+
+// ── FETCH: MASTODON public search ──────────────────────────────────────────────
+async function fetchMastodon(query) {
+  try {
+    const url = `https://mastodon.social/api/v2/search?q=${encodeURIComponent(query)}&type=statuses&limit=20&resolve=false`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.statuses || []).map(s => ({
+      platform:    'mastodon',
+      displayName: s.account?.display_name || s.account?.username || 'Mastodon',
+      handle:      `@${s.account?.acct || s.account?.username || ''}`,
+      content:     stripHtml(s.content || '').slice(0, 600),
+      link:        s.url || '#',
+      pubDate:     s.created_at || '',
+      likes:       s.favourites_count || 0,
+      retweets:    s.reblogs_count    || 0,
+      replies:     s.replies_count    || 0,
+    })).filter(p => p.content && p.content.length > 20);
+  } catch(e) {
+    console.warn('[Mastodon] failed:', e.message);
+    return [];
+  }
+}
+
+// ── FETCH: REDDIT RSS ──────────────────────────────────────────────────────────
+async function fetchReddit(subreddits, query) {
+  try {
+    const feedUrl = `https://www.reddit.com/r/${subreddits}/search.rss?q=${encodeURIComponent(query)}&sort=new&limit=20&restrict_sr=true`;
+    const res = await fetch(RSS2JSON + encodeURIComponent(feedUrl), { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return [];
+    const json = await res.json();
+    if (json.status !== 'ok') return [];
+    return (json.items || []).map(item => ({
+      platform:    'reddit',
+      displayName: item.author || 'Redditor',
+      handle:      item.author ? `u/${item.author}` : 'Reddit',
+      content:     (item.title || '').trim(),
+      link:        item.link || '#',
+      pubDate:     item.pubDate || '',
+      likes:    0, retweets: 0, replies: 0,
+    })).filter(p => p.content);
+  } catch(e) {
+    console.warn('[Reddit] failed:', e.message);
+    return [];
+  }
+}
+
+// ── FETCH: NAVER 블로그/SNS (국내 모드) ───────────────────────────────────────
+async function fetchNaverSocial(query) {
+  // 네이버 블로그 RSS via rss2json (공개 블로그)
+  const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' site:blog.naver.com OR site:brunch.co.kr')}&hl=ko&gl=KR&ceid=KR:ko`;
+  try {
+    const res = await fetch(RSS2JSON + encodeURIComponent(feedUrl), { signal: AbortSignal.timeout(7000) });
+    if (!res.ok) return [];
+    const json = await res.json();
+    if (json.status !== 'ok') return [];
+    return (json.items || []).map(item => ({
+      platform:    'blog',
+      displayName: json.feed?.title || '블로그',
+      handle:      '블로그/브런치',
+      content:     (item.title || '').trim(),
+      link:        item.link || '#',
+      pubDate:     item.pubDate || '',
+      likes: 0, retweets: 0, replies: 0,
+    })).filter(p => p.content);
+  } catch(e) {
+    return [];
+  }
+}
+
+// ── PLATFORM ICON ─────────────────────────────────────────────────────────────
+const PLAT_ICON = {
+  twitter:  '𝕏',
+  mastodon: '🐘',
+  reddit:   '🤖',
+  blog:     '📝',
+};
+const PLAT_LABEL = {
+  twitter:  'Twitter',
+  mastodon: 'Mastodon',
+  reddit:   'Reddit',
+  blog:     '블로그',
+};
+
+// ── RENDER CARD ───────────────────────────────────────────────────────────────
+function renderCard(post, idx) {
+  const stats = (post.likes || post.retweets || post.replies)
+    ? `<div class="social-stats">
+        <span class="social-stat">🔁 ${post.retweets}</span>
+        <span class="social-stat">♥ ${post.likes}</span>
+        <span class="social-stat">💬 ${post.replies}</span>
+       </div>`
+    : '<div></div>';
+  return `
+    <div class="social-card">
+      <div class="social-card-head">
+        <div class="social-handle">
+          <div class="social-avatar ${post.platform}">${PLAT_ICON[post.platform] || '●'}</div>
+          <div>
+            <div class="social-name">${escHtml(post.displayName)}</div>
+            <div class="social-uname">${escHtml(post.handle)}</div>
+          </div>
+        </div>
+        <span class="plat-badge ${post.platform}">${PLAT_ICON[post.platform]} ${PLAT_LABEL[post.platform]}</span>
+      </div>
+      <p class="social-content" id="scon-${idx}">${escHtml(post.content)}</p>
+      <button class="social-more" onclick="toggleSocial(this,'scon-${idx}')">더보기 →</button>
+      <div class="social-card-foot">
+        ${stats}
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span class="social-time">${timeAgo(post.pubDate)}</span>
+          <a class="social-link" href="${escHtml(post.link)}" target="_blank" rel="noopener">보기 →</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+function toggleSocial(btn, id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const expanded = el.classList.toggle('expanded');
+  btn.textContent = expanded ? '접기 ↑' : '더보기 →';
+}
+
+// ── FILTER & RENDER PAGE ──────────────────────────────────────────────────────
+function renderPage(posts, cat) {
+  const meta = CAT_META[cat];
+  const now  = new Date();
+  document.getElementById('issue-info').textContent =
+    `${meta.title} SNS · ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+
+  // Ticker
+  const tickerHTML = [...posts, ...posts].slice(0, 40).map(p =>
+    `<div class="ticker-item"><span>●</span>${p.content.slice(0, 55)}${p.content.length > 55 ? '…' : ''}</div>`
+  ).join('');
+  document.getElementById('ticker-track').innerHTML = tickerHTML || '<div class="ticker-item">로딩 중...</div>';
+
+  const visible = currentPlat === 'all' ? posts : posts.filter(p => p.platform === currentPlat);
+
+  const twitterPosts  = posts.filter(p => p.platform === 'twitter');
+  const mastodonPosts = posts.filter(p => p.platform === 'mastodon');
+  const redditPosts   = posts.filter(p => p.platform === 'reddit');
+  const blogPosts     = posts.filter(p => p.platform === 'blog');
+
+  document.getElementById('app').innerHTML = `
+    <div class="container" style="padding-top:2rem;padding-bottom:0">
+      <div class="social-hero">
+        <div>
+          <div class="hero-label">대체투자 SNS 인사이트 ${currentMode === 'ko' ? '🇰🇷 국내' : '🌏 글로벌'} — ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일</div>
+          <div class="hero-title">${meta.icon} ${meta.title} <span style="font-size:1.1rem;font-weight:400;color:var(--ink-2)">(${meta.en})</span></div>
+          <div class="hero-desc">${meta.desc}</div>
+        </div>
+        <div class="hero-platforms">
+          <div class="hero-plat-item"><span>𝕏</span> Twitter · ${twitterPosts.length}건</div>
+          <div class="hero-plat-item"><span>🐘</span> Mastodon · ${mastodonPosts.length}건</div>
+          <div class="hero-plat-item"><span>🤖</span> Reddit · ${redditPosts.length}건</div>
+          ${blogPosts.length ? `<div class="hero-plat-item"><span>📝</span> 블로그 · ${blogPosts.length}건</div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="padding-top:1.5rem">
+      <div class="notice-bar">
+        ℹ️ Twitter(X) 콘텐츠는 Nitter 오픈소스 프록시를 통해 수집됩니다. 인스턴스 상태에 따라 가용성이 달라질 수 있습니다.
+      </div>
+      <div class="section-header">
+        <h2 class="section-title">${currentPlat === 'all' ? '전체 피드' : PLAT_LABEL[currentPlat] + ' 피드'}</h2>
+        <span class="section-meta">${visible.length}건</span>
+      </div>
+      ${visible.length ? `<div class="social-grid">${visible.map((p, i) => renderCard(p, i)).join('')}</div>`
+        : `<div class="error-state">
+             <div style="font-size:2rem;margin-bottom:1rem">📡</div>
+             <h3 style="margin-bottom:0.5rem">해당 플랫폼 콘텐츠를 불러올 수 없습니다</h3>
+             <p style="color:var(--ink-muted);margin-bottom:1.5rem">네트워크 상태 또는 API 제한으로 인해 표시되지 않을 수 있습니다.</p>
+             <button class="btn" onclick="loadCat('${cat}')">↺ 다시 시도</button>
+           </div>`
+      }
+    </div>
+
+    <div class="sectors-strip">
+      <div class="container">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;opacity:.85">전 섹터 SNS</div>
+        <div class="sectors-grid">
+          ${Object.entries(CAT_META).map(([k, m]) => `
+            <div class="sector-tile ${k === cat ? 'active-tile' : ''}" onclick="switchCat('${k}')">
+              <div class="sector-icon">${m.icon}</div>
+              <div class="sector-name">${m.title}</div>
+              <div class="sector-en">${m.en}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <div class="footer-name">대체투자 SNS 인사이트</div>
+          <p class="footer-note">Twitter(X) · Mastodon · Reddit 공개 게시물을 실시간 수집합니다. Nitter 오픈소스 프록시 경유.</p>
+          <div class="footer-links">
+            ${Object.entries(CAT_META).map(([k, m]) =>
+              `<a class="footer-link" href="#" onclick="switchCat('${k}');return false">${m.title}</a>`
+            ).join('')}
+            <a class="footer-link" href="index.html">리서치 논문</a>
+            <a class="footer-link" href="news.html">뉴스 피드</a>
+          </div>
+        </div>
+      </div>
+    </footer>`;
+
+  document.getElementById('skeleton').style.display = 'none';
+}
+
+// ── LOAD CATEGORY ─────────────────────────────────────────────────────────────
+async function loadCat(cat, mode) {
+  currentCat  = cat;
+  currentMode = mode || currentMode;
+  const q = QUERIES[cat];
+  if (!q) return;
+
+  // Update field tag active state
+  document.querySelectorAll('.field-tag').forEach(el => {
+    el.classList.toggle('active', el.dataset.cat === cat);
+  });
+
+  document.getElementById('skeleton').style.display = '';
+  document.getElementById('app').innerHTML = '';
+
+  let posts = [];
+  const query = currentMode === 'ko' ? q.ko : q.en;
+  const hashQuery = currentMode === 'ko' ? q.ko : `#${q.tag} ${q.en}`;
+
+  const [tw, ms, rd] = await Promise.allSettled([
+    fetchTwitter(query),
+    fetchMastodon(hashQuery),
+    currentMode === 'ko'
+      ? fetchNaverSocial(q.ko)
+      : fetchReddit(q.reddit, q.en),
+  ]);
+
+  if (tw.status === 'fulfilled')  posts.push(...tw.value);
+  if (ms.status === 'fulfilled')  posts.push(...ms.value);
+  if (rd.status === 'fulfilled')  posts.push(...rd.value);
+
+  // Sort by date descending
+  posts.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  allPosts = posts;
+
+  renderPage(posts, cat);
+}
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────────
+function switchCat(cat) {
+  loadCat(cat, currentMode);
+}
+
+function setPlatform(plat) {
+  currentPlat = plat;
+  document.querySelectorAll('.feed-toggle-btn[data-plat]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.plat === plat);
+  });
+  renderPage(allPosts, currentCat);
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-global').classList.toggle('active', mode === 'global');
+  document.getElementById('btn-ko').classList.toggle('active', mode === 'ko');
+  loadCat(currentCat, mode);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadCat('alt.PE', 'global');
+</script>
+</body>
+</html>

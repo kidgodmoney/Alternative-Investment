@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대체투자 뉴스피드 — Alternative Investment News</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -101,8 +103,11 @@
 
     /* ── TICKER ── */
     .ticker-wrap { overflow: hidden; border-bottom: 1px solid var(--border); background: rgba(167,139,250,0.04); height: 34px; display: flex; align-items: center; }
-    .ticker-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); padding: 0 1.1rem; white-space: nowrap; border-right: 1px solid var(--border-2); flex-shrink: 0; }
-    .ticker-track { display: flex; animation: ticker 45s linear infinite; white-space: nowrap; }
+    .ticker-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); padding: 0 1.1rem; white-space: nowrap; border-right: 1px solid var(--border-2); flex-shrink: 0; z-index: 2; }
+    .ticker-body  { position: relative; flex: 1; overflow: hidden; height: 100%; display: flex; align-items: center; }
+    .ticker-body::before { content: ''; position: absolute; left: 0; top: 0; width: 60px; height: 100%; background: linear-gradient(to right, var(--bg-2, #111118) 30%, transparent); z-index: 1; pointer-events: none; }
+    .ticker-body::after  { content: ''; position: absolute; right: 0; top: 0; width: 60px; height: 100%; background: linear-gradient(to left,  var(--bg-2, #111118) 30%, transparent); z-index: 1; pointer-events: none; }
+    .ticker-track { display: flex; animation: ticker 80s linear infinite; white-space: nowrap; }
     .ticker-item  { font-size: 11px; color: var(--ink-2); padding: 0 2rem; transition: color 0.12s; }
     .ticker-item:hover { color: var(--ink); }
     @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
@@ -124,7 +129,7 @@
     .news-card {
       background: rgba(255,255,255,0.03); backdrop-filter: blur(16px);
       border: 1px solid var(--border); border-radius: var(--r);
-      padding: 1.4rem; display: flex; flex-direction: column; gap: 0.5rem;
+      padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;
       cursor: pointer; text-decoration: none; color: inherit;
       transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
       animation: fadeUp 0.4s ease both;
@@ -136,6 +141,10 @@
     .news-card-time   { font-size: 10px; color: var(--ink-2); margin-top: auto; }
     .source-badge { font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 4px; background: var(--accent-lt); color: var(--accent); display: inline-block; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    /* ── CATEGORY COLORS ── */
+    .alt-pe  { --c: #a78bfa; } .alt-re  { --c: #60a5fa; }
+    .alt-inf { --c: #34d399; } .alt-hf  { --c: #fb923c; } .alt-vc  { --c: #f472b6; }
+    .field-tag--alt.active, .field-tag--alt:hover { color: var(--c, var(--accent)); }
 
     /* ── SECTORS ── */
     .sector-tile {
@@ -189,7 +198,7 @@
     .loading-spinner { width: 28px; height: 28px; border: 2px solid var(--border-2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .section-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.5rem; }
 
     /* Cat hero glass panel */
     .cat-hero { padding: 2rem 0 0; }
@@ -239,7 +248,7 @@
     /* Sectors */
     .sectors-strip { padding: 2rem 0; border-top: 1px solid var(--border); margin-top: 2rem; }
     .sectors-grid  { display: grid; grid-template-columns: repeat(5,1fr); gap: 0.75rem; margin-top: 1rem; }
-    .active-tile   { border-color: var(--accent) !important; background: var(--accent-lt) !important; }
+    .active-tile   { border-color: rgba(167,139,250,0.35); background: var(--accent-lt); }
 
     @media (max-width: 768px) {
       .cat-hero-inner { flex-direction: column; }
@@ -261,6 +270,7 @@
     <nav class="page-nav">
       <a href="index.html">리서치 논문</a>
       <a class="current" href="news.html">뉴스 피드</a>
+      <a href="social.html">SNS 인사이트</a>
       <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="테마 변경">☀</button>
     </nav>
   </div>
@@ -286,8 +296,10 @@
 <!-- TICKER (static placeholder, filled by JS) -->
 <div class="ticker-wrap">
   <div class="ticker-label">실시간</div>
-  <div class="ticker-track" id="ticker-track">
-    <div class="ticker-item"><span>●</span>뉴스 피드 로딩 중...</div>
+  <div class="ticker-body">
+    <div class="ticker-track" id="ticker-track">
+      <div class="ticker-item"><span>●</span>뉴스 피드 로딩 중...</div>
+    </div>
   </div>
 </div>
 
